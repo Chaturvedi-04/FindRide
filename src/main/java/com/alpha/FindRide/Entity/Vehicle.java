@@ -2,14 +2,12 @@ package com.alpha.FindRide.Entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 
 @Entity
 public class Vehicle {
 
 	@Id
-	@MapsId
 	private int id;
 	private String name;
 	private String vehicleNo;
