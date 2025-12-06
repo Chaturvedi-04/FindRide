@@ -2,9 +2,11 @@ package com.alpha.FindRide.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.alpha.FindRide.ResponseStructure;
 import com.alpha.FindRide.DTO.RegisterDriverVehicleDTO;
 import com.alpha.FindRide.Entity.Driver;
 import com.alpha.FindRide.Entity.Vehicle;
@@ -29,7 +31,7 @@ public class DriverService {
 	@Autowired
 	private VehicleRepo vr;
 
-	public Driver saveDriver(RegisterDriverVehicleDTO rdto) {
+	public ResponseStructure<Driver> saveDriver(RegisterDriverVehicleDTO rdto) {
 		
 		Driver d = new Driver();
 		d.setLicenseNo(rdto.getLicenseNo());
@@ -75,10 +77,15 @@ public class DriverService {
 		v.setAvailableStatus("Available");
 		v.setPricePerKM(rdto.getPricePerKM());
 		
+		v.setDriver(d);
 		vr.save(v);
 		d.setVehicle(v);
 		
-		return d;
+		ResponseStructure<Driver> rs= new ResponseStructure<Driver>();		
+		rs.setStatuscode(HttpStatus.CREATED.value());
+		rs.setMessage("Driver is saved");
+		rs.setData(d);
+		return rs;
 	}
 	
 	public Driver findDriver(long mobileno) {

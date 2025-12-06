@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alpha.FindRide.ResponseStructure;
 import com.alpha.FindRide.DTO.RegisterDriverVehicleDTO;
 import com.alpha.FindRide.Entity.Driver;
 import com.alpha.FindRide.Service.DriverService;
@@ -20,7 +21,7 @@ public class DriverController {
 	private DriverService ds;
 	
 	@PostMapping("/saveDriver")
-	public Driver saveDriver(@RequestBody RegisterDriverVehicleDTO rdto)
+	public ResponseStructure<Driver> saveDriver(@RequestBody RegisterDriverVehicleDTO rdto)
 	{
 		return ds.saveDriver(rdto);
 	}
