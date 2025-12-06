@@ -8,4 +8,6 @@ import com.alpha.FindRide.Entity.Customer;
 @Repository
 public interface CustomerRepo extends JpaRepository<Customer, Integer> {
 
+	Customer findByMobileno(long mobileno);
+
 }

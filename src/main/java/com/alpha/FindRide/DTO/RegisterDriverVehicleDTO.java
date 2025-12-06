@@ -139,7 +139,4 @@ public class RegisterDriverVehicleDTO {
 				+ ", model=" + model + ", vehicleCapacity=" + vehicleCapacity + ", latitude=" + latitude
 				+ ", longitude=" + longitude + ", pricePerKM=" + pricePerKM + "]";
 	}
-	
-	
-	
 }

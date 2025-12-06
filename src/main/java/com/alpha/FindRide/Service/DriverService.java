@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.alpha.FindRide.ResponseStructure;
+import com.alpha.FindRide.DTO.FindDriverDTO;
 import com.alpha.FindRide.DTO.RegisterDriverVehicleDTO;
+import com.alpha.FindRide.DTO.UpdateLocationDTO;
 import com.alpha.FindRide.Entity.Driver;
 import com.alpha.FindRide.Entity.Vehicle;
 import com.alpha.FindRide.Exceptions.DriverNotFoundException;
@@ -87,24 +89,24 @@ public class DriverService {
 		return rs;
 	}
 	
-	public ResponseStructure<Driver> findDriver(long mobileno) {
-	    Driver d = dr.findByMobileno(mobileno);
+	public ResponseStructure<Driver> findDriver(FindDriverDTO fdto) {
+	    Driver d = dr.findByMobileno(fdto.getMobileno());
 	    if (d == null) {
-	        throw new DriverNotFoundException("Driver with mobile number " + mobileno + " not found");
+	        throw new DriverNotFoundException();
 	    }
         ResponseStructure<Driver> rs = new ResponseStructure<>();
         rs.setStatuscode(HttpStatus.FOUND.value());
-        rs.setMessage("Driver with MobileNo " + mobileno + " found");
+        rs.setMessage("Driver with MobileNo " + fdto.getMobileno() + " found");
         rs.setData(d);
 
         return rs;
 	}
 
-	public ResponseStructure<Driver> updateLocation(long mobileno, String lat, String lon) {
+	public ResponseStructure<Driver> updateLocation(UpdateLocationDTO udto) {
 
-		    Driver d = dr.findByMobileno(mobileno);
+		    Driver d = dr.findByMobileno(udto.getMobileno());
 		    if (d == null) {
-		        throw new DriverNotFoundException("Driver with mobile number " + mobileno + " not found");
+		        throw new DriverNotFoundException();
 		    }
 
 		    Vehicle v = d.getVehicle();
@@ -114,8 +116,8 @@ public class DriverService {
 
 		    try {
 		        String url = "https://us1.locationiq.com/v1/reverse?key=" + apiKey +
-		                "&lat=" + lat +
-		                "&lon=" + lon +
+		                "&lat=" + udto.getLatitude() +
+		                "&lon=" + udto.getLongitude() +
 		                "&format=json";
 
 		        RestTemplate restTemplate = new RestTemplate();
