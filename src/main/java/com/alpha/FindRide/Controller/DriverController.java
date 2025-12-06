@@ -3,8 +3,10 @@ package com.alpha.FindRide.Controller;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alpha.FindRide.DTO.RegisterDriverVehicleDTO;
@@ -37,4 +39,8 @@ public class DriverController {
 
 	        return ds.updateLocation(mobile, lat, lon);
 	    }
+	 @DeleteMapping("/deleteDriver")
+	 public void deleteDriver(@RequestParam long mobileno) {
+		 ds.deleteDriver(mobileno);
+	 }
 }
