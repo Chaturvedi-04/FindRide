@@ -45,7 +45,7 @@ public class DriverService {
 		
 		Vehicle v = new Vehicle();
 		
-		v.setId(d.getId());
+		v.setDriver(d);
 		v.setName(rdto.getVehicleName());
 		v.setVehicleNo(rdto.getVehicleNo());
 		v.setType(rdto.getVehicleType());
@@ -76,10 +76,9 @@ public class DriverService {
         }
 		v.setAvailableStatus("Available");
 		v.setPricePerKM(rdto.getPricePerKM());
-		
-		v.setDriver(d);
-		vr.save(v);
 		d.setVehicle(v);
+		
+		vr.save(v);
 		
 		ResponseStructure<Driver> rs= new ResponseStructure<Driver>();		
 		rs.setStatuscode(HttpStatus.CREATED.value());
@@ -88,15 +87,20 @@ public class DriverService {
 		return rs;
 	}
 	
-	public Driver findDriver(long mobileno) {
+	public ResponseStructure<Driver> findDriver(long mobileno) {
 	    Driver d = dr.findByMobileno(mobileno);
 	    if (d == null) {
 	        throw new DriverNotFoundException("Driver with mobile number " + mobileno + " not found");
 	    }
-	    return d;
+        ResponseStructure<Driver> rs = new ResponseStructure<>();
+        rs.setStatuscode(HttpStatus.FOUND.value());
+        rs.setMessage("Driver with MobileNo " + mobileno + " found");
+        rs.setData(d);
+
+        return rs;
 	}
 
-	public Driver updateLocation(long mobileno, String lat, String lon) {
+	public ResponseStructure<Driver> updateLocation(long mobileno, String lat, String lon) {
 
 		    Driver d = dr.findByMobileno(mobileno);
 		    if (d == null) {
@@ -130,19 +134,28 @@ public class DriverService {
 		    vr.save(v);
 		    d.setVehicle(v);
 
-		    return d;
+		    ResponseStructure<Driver> rs = new ResponseStructure<>();
+		    rs.setStatuscode(HttpStatus.OK.value());
+		    rs.setMessage("Driver updated successfully");
+		    rs.setData(d);
+		    return rs;
 
 	}
 
-	public void deleteDriver(long mobileno) {
+	public ResponseStructure<String> deleteDriver(long mobileno) {
 		Driver d = dr.findByMobileno(mobileno);
 		if(d!=null) {
 			dr.delete(d);
-			System.out.println("Driver Deleted");
-		}else {
+		}
+		else {
 		System.out.println("Driver Not Deleted");
 		}
-		
+		ResponseStructure<String> rs = new ResponseStructure<>();
+	    rs.setStatuscode(HttpStatus.OK.value());
+	    rs.setMessage("Doctor deleted");
+	    rs.setData("Driver with MobileNo " + mobileno + " removed");
+
+	    return rs;
 	}
 	
 	
