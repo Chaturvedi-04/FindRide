@@ -2,6 +2,7 @@ package com.alpha.FindRide.Entity;
 
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,7 +21,7 @@ public class Customer {
 	private long mobileno;
 	private String emailid;
 	private String currentloc;
-	@OneToMany
+	@OneToMany(mappedBy = "cust", cascade = CascadeType.ALL)
 	private List<Booking> bookingList;
 	public Customer(int id, String name, int age, String gender, long mobileno, String emailid, String currentloc,
 			List<Booking> bookingList) {
