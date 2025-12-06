@@ -8,4 +8,6 @@ import com.alpha.FindRide.Entity.Driver;
 @Repository
 public interface DriverRepo extends JpaRepository<Driver ,Integer>{
 
+
+    Driver findByMobileno(long mobileno);
 }

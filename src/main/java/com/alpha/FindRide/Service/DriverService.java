@@ -8,6 +8,8 @@ import org.springframework.web.client.RestTemplate;
 import com.alpha.FindRide.DTO.RegisterDriverVehicleDTO;
 import com.alpha.FindRide.Entity.Driver;
 import com.alpha.FindRide.Entity.Vehicle;
+import com.alpha.FindRide.Exceptions.DriverNotFoundException;
+import com.alpha.FindRide.Exceptions.LocationFetchException;
 import com.alpha.FindRide.Repository.DriverRepo;
 import com.alpha.FindRide.Repository.VehicleRepo;
 
@@ -77,6 +79,52 @@ public class DriverService {
 		d.setVehicle(v);
 		
 		return d;
+	}
+	
+	public Driver findDriver(long mobileno) {
+	    Driver d = dr.findByMobileno(mobileno);
+	    if (d == null) {
+	        throw new DriverNotFoundException("Driver with mobile number " + mobileno + " not found");
+	    }
+	    return d;
+	}
+
+	public Driver updateLocation(long mobileno, String lat, String lon) {
+
+		    Driver d = dr.findByMobileno(mobileno);
+		    if (d == null) {
+		        throw new DriverNotFoundException("Driver with mobile number " + mobileno + " not found");
+		    }
+
+		    Vehicle v = d.getVehicle();
+		    if (v == null) {
+		        throw new RuntimeException("Vehicle not assigned for this driver");
+		    }
+
+		    try {
+		        String url = "https://us1.locationiq.com/v1/reverse?key=" + apiKey +
+		                "&lat=" + lat +
+		                "&lon=" + lon +
+		                "&format=json";
+
+		        RestTemplate restTemplate = new RestTemplate();
+		        String response = restTemplate.getForObject(url, String.class);
+
+		        ObjectMapper mapper = new ObjectMapper();
+		        JsonNode json = mapper.readTree(response);
+
+		        String city = json.get("address").get("city").asString();
+		        v.setCurrentCity(city);
+
+		    } catch (Exception e) {
+		        throw new LocationFetchException("Failed to fetch location from LocationIQ: " + e.getMessage());
+		    }
+
+		    vr.save(v);
+		    d.setVehicle(v);
+
+		    return d;
+
 	}
 	
 	
