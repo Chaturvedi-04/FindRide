@@ -1,5 +1,4 @@
 package com.alpha.FindRide.Entity;
-import java.util.Date;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -99,7 +98,4 @@ public String toString() {
 			+ ", destinationLoc=" + destinationLoc + ", distanceTravelled=" + distanceTravelled + ", fare=" + fare
 			+ ", estimatedTime=" + estimatedTime + ", bookingDate=" + bookingDate + "]";
 }
-	
-	
-
 }
