@@ -126,6 +126,17 @@ public class DriverService {
 		    return d;
 
 	}
+
+	public void deleteDriver(long mobileno) {
+		Driver d = dr.findByMobileno(mobileno);
+		if(d!=null) {
+			dr.delete(d);
+			System.out.println("Driver Deleted");
+		}else {
+		System.out.println("Driver Not Deleted");
+		}
+		
+	}
 	
 	
 }
