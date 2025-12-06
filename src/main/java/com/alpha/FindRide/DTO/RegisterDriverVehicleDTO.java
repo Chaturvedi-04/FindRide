@@ -18,6 +18,8 @@ public class RegisterDriverVehicleDTO {
 	private String latitude;
 	private String longitude;
 	private int pricePerKM;
+	private double averageSpeed;
+	
 	public long getLicenseNo() {
 		return licenseNo;
 	}
@@ -108,9 +110,21 @@ public class RegisterDriverVehicleDTO {
 	public void setPricePerKM(int pricePerKM) {
 		this.pricePerKM = pricePerKM;
 	}
+	
+	@Override
+	public String toString() {
+		return "RegisterDriverVehicleDTO [licenseNo=" + licenseNo + ", upiid=" + upiid + ", driverName=" + driverName
+				+ ", age=" + age + ", mobileno=" + mobileno + ", gender=" + gender + ", mailid=" + mailid
+				+ ", vehicleName=" + vehicleName + ", vehicleNo=" + vehicleNo + ", vehicleType=" + vehicleType
+				+ ", model=" + model + ", vehicleCapacity=" + vehicleCapacity + ", latitude=" + latitude
+				+ ", longitude=" + longitude + ", pricePerKM=" + pricePerKM + ", averageSpeed=" + averageSpeed + "]";
+	}
+	public RegisterDriverVehicleDTO() {
+		super();
+	}
 	public RegisterDriverVehicleDTO(long licenseNo, String upiid, String driverName, int age, long mobileno,
 			String gender, String mailid, String vehicleName, String vehicleNo, String vehicleType, String model,
-			int vehicleCapacity, String latitude, String longitude, int pricePerKM) {
+			int vehicleCapacity, String latitude, String longitude, int pricePerKM, double averageSpeed) {
 		super();
 		this.licenseNo = licenseNo;
 		this.upiid = upiid;
@@ -127,16 +141,12 @@ public class RegisterDriverVehicleDTO {
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.pricePerKM = pricePerKM;
+		this.averageSpeed = averageSpeed;
 	}
-	public RegisterDriverVehicleDTO() {
-		super();
+	public double getAverageSpeed() {
+		return averageSpeed;
 	}
-	@Override
-	public String toString() {
-		return "RegisterDriverVehicleDTO [licenseNo=" + licenseNo + ", upiid=" + upiid + ", driverName=" + driverName
-				+ ", age=" + age + ", mobileno=" + mobileno + ", gender=" + gender + ", mailid=" + mailid
-				+ ", vehicleName=" + vehicleName + ", vehicleNo=" + vehicleNo + ", vehicleType=" + vehicleType
-				+ ", model=" + model + ", vehicleCapacity=" + vehicleCapacity + ", latitude=" + latitude
-				+ ", longitude=" + longitude + ", pricePerKM=" + pricePerKM + "]";
+	public void setAverageSpeed(double averageSpeed) {
+		this.averageSpeed = averageSpeed;
 	}
 }
