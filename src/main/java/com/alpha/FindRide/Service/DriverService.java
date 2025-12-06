@@ -154,7 +154,7 @@ public class DriverService {
 		}
 		ResponseStructure<String> rs = new ResponseStructure<>();
 	    rs.setStatuscode(HttpStatus.OK.value());
-	    rs.setMessage("Doctor deleted");
+	    rs.setMessage("Driver deleted");
 	    rs.setData("Driver with MobileNo " + mobileno + " removed");
 
 	    return rs;

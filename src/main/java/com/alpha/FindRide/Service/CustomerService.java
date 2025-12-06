@@ -77,5 +77,21 @@ public class CustomerService {
         return rs;
 	}
 	
+	public ResponseStructure<String> deleteCustomer(long mobileno){
+		Customer c = cr.findByMobileno(mobileno);
+		if(c == null) {
+			throw new CustomerNotFoundException();
+		}
+		
+		ResponseStructure<String> rs = new ResponseStructure<>();
+	    rs.setStatuscode(HttpStatus.OK.value());
+	    rs.setMessage("Customer deleted");
+	    rs.setData("Customer with MobileNo " + mobileno + " removed");
+	    return rs;
+
+		
+		
+		
+	}
 
 }
