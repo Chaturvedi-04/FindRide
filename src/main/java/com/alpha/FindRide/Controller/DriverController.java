@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alpha.FindRide.ResponseStructure;
 import com.alpha.FindRide.DTO.RegisterDriverVehicleDTO;
 import com.alpha.FindRide.Entity.Driver;
 import com.alpha.FindRide.Service.DriverService;
@@ -20,19 +21,19 @@ public class DriverController {
 	private DriverService ds;
 	
 	@PostMapping("/saveDriver")
-	public Driver saveDriver(@RequestBody RegisterDriverVehicleDTO rdto)
+	public ResponseStructure<Driver> saveDriver(@RequestBody RegisterDriverVehicleDTO rdto)
 	{
 		return ds.saveDriver(rdto);
 	}
 	
 	@PostMapping("/findDriver")
-    public Driver findDriver(@RequestBody Map<String, Long> req) {
+    public ResponseStructure<Driver> findDriver(@RequestBody Map<String, Long> req) {
         long mobile = req.get("mobileno");
         return ds.findDriver(mobile);
     }
 	
 	 @PostMapping("/updateLocation")
-	    public Driver updateLocation(@RequestBody Map<String, String> req) {
+	    public ResponseStructure<Driver> updateLocation(@RequestBody Map<String, String> req) {
 	        long mobile = Long.parseLong(req.get("mobileno"));
 	        String lat = req.get("latitude");
 	        String lon = req.get("longitude");
@@ -40,7 +41,7 @@ public class DriverController {
 	        return ds.updateLocation(mobile, lat, lon);
 	    }
 	 @DeleteMapping("/deleteDriver")
-	 public void deleteDriver(@RequestParam long mobileno) {
-		 ds.deleteDriver(mobileno);
+	 public ResponseStructure<String> deleteDriver(@RequestParam long mobileno) {
+		 return ds.deleteDriver(mobileno);
 	 }
 }

@@ -1,5 +1,7 @@
 package com.alpha.FindRide.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,7 +24,8 @@ public class Driver {
 	private String gender;
 	private String mailid;
 	
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne(mappedBy = "driver", cascade = CascadeType.ALL)
+	@JsonIgnore
 	private Vehicle vehicle;
 
 	public int getId() {
