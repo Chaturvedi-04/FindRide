@@ -1,7 +1,6 @@
 package com.alpha.FindRide.Exceptions;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -29,25 +28,34 @@ public class GlobalException {
     }
 
     @ExceptionHandler(LocationFetchException.class)
-    public ResponseEntity<ResponseStructure<String>> locationException(LocationFetchException ex) {
+    public ResponseStructure<String> locationException(LocationFetchException ex) {
 
         ResponseStructure<String> response = new ResponseStructure<>();
         response.setStatuscode(HttpStatus.BAD_GATEWAY.value());
         response.setMessage(ex.getMessage());
         response.setData(null);
 
-        return new ResponseEntity<>(response, HttpStatus.BAD_GATEWAY);
+        return response;
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ResponseStructure<String>> global(Exception ex) {
+    public ResponseStructure<String> global(Exception ex) {
 
         ResponseStructure<String> response = new ResponseStructure<>();
         response.setStatuscode(HttpStatus.INTERNAL_SERVER_ERROR.value());
         response.setMessage(ex.getMessage());
         response.setData(null);
 
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        return response;
     }
-
+    
+    @ExceptionHandler(InvalidDestinationLocationException.class)
+    public ResponseStructure<String> invalidDestinationException(InvalidDestinationLocationException ex) {
+        ResponseStructure<String> response = new ResponseStructure<String>();
+        response.setStatuscode(HttpStatus.BAD_GATEWAY.value());
+        response.setMessage(ex.getMessage());
+        response.setData(null);
+        
+        return response;
+    }
 }

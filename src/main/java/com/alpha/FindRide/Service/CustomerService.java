@@ -17,6 +17,7 @@ import com.alpha.FindRide.DTO.VehicleDetailDTO;
 import com.alpha.FindRide.Entity.Customer;
 import com.alpha.FindRide.Entity.Vehicle;
 import com.alpha.FindRide.Exceptions.CustomerNotFoundException;
+import com.alpha.FindRide.Exceptions.InvalidDestinationLocationException;
 import com.alpha.FindRide.Repository.CustomerRepo;
 import com.alpha.FindRide.Repository.VehicleRepo;
 
@@ -97,15 +98,14 @@ public class CustomerService {
 	    rs.setMessage("Customer deleted");
 	    rs.setData("Customer with MobileNo " + mobileno + " removed");
 	    return rs;
-
-		
-		
-		
 	}
 
 	public ResponseStructure<AvailableVehicleDTO> seeallAvailableVehicles(long mobileno, String destinationCity) {
 		
 		Customer c = cr.findByMobileno(mobileno);
+	    if (c == null) {
+	        throw new CustomerNotFoundException();
+	    }
 		String sourceLoc = c.getCurrentloc();
 		String destionationLoc = destinationCity;
 		double distance;
@@ -118,8 +118,11 @@ public class CustomerService {
 	        String srcUrl = "https://us1.locationiq.com/v1/search?key=" + apiKey +
 	                "&q=" + sourceLoc + "&format=json";
 
-	        String srcResponse = restTemplate.getForObject(srcUrl, String.class);
-	        JsonNode srcJson = mapper.readTree(srcResponse).get(0);
+	        JsonNode srcJsonArray = mapper.readTree(restTemplate.getForObject(srcUrl, String.class));
+	        if (srcJsonArray.isEmpty()) {
+	            throw new RuntimeException("Invalid source city returned null data.");
+	        }
+	        JsonNode srcJson = srcJsonArray.get(0);
 
 	        double srcLat = srcJson.get("lat").asDouble();
 	        double srcLon = srcJson.get("lon").asDouble();
@@ -128,11 +131,17 @@ public class CustomerService {
 	        String destUrl = "https://us1.locationiq.com/v1/search?key=" + apiKey +
 	                "&q=" + destionationLoc + "&format=json";
 
-	        String destResponse = restTemplate.getForObject(destUrl, String.class);
-	        JsonNode destJson = mapper.readTree(destResponse).get(0);
+	        JsonNode destJsonArray = mapper.readTree(restTemplate.getForObject(destUrl, String.class));
 
+	        // 🚨 Check if destination is invalid
+	        if (destJsonArray == null || destJsonArray.isEmpty()) {
+	            throw new InvalidDestinationLocationException();
+	        }
+
+	        JsonNode destJson = destJsonArray.get(0);
 	        double destLat = destJson.get("lat").asDouble();
 	        double destLon = destJson.get("lon").asDouble();
+	        
 
 	        // Step 3: Use Directions API to get distance
 	        String directionUrl = String.format(
@@ -140,9 +149,8 @@ public class CustomerService {
 	            srcLon, srcLat, destLon, destLat, apiKey
 	        );
 
-	        String dirResponse = restTemplate.getForObject(directionUrl, String.class);
-	        JsonNode dirJson = mapper.readTree(dirResponse);
-
+	        JsonNode dirJson = mapper.readTree(restTemplate.getForObject(directionUrl, String.class));
+	        
 	        double distanceInMeters = dirJson.get("routes").get(0).get("distance").asDouble();
 	        distance = distanceInMeters / 1000; // Convert meters → kilometers
 	    }
@@ -151,6 +159,7 @@ public class CustomerService {
 	    }
 	    AvailableVehicleDTO avd = new AvailableVehicleDTO();
 	    avd.setAvailableVehicles(new ArrayList<>());
+	    
 	    List<Vehicle> availableVehicles = vr.findByCurrentCity(sourceLoc);
 	    
 	    for(Vehicle v: availableVehicles)
@@ -160,11 +169,14 @@ public class CustomerService {
 	    	VehicleDetailDTO vd = new VehicleDetailDTO(v,fare,estimatedTime);
 	    	avd.getAvailableVehicles().add(vd);
 	    }
+	    
 	    avd.setC(c);
 	    avd.setDistance(distance);
 	    avd.setSourceloc(sourceLoc);
 	    avd.setDestinationloc(destionationLoc);
+	    
 	    ResponseStructure<AvailableVehicleDTO> rs = new ResponseStructure<AvailableVehicleDTO>();
+	    
 	    rs.setStatuscode(HttpStatus.ACCEPTED.value());
 	    rs.setMessage("Available Cars");
 	    rs.setData(avd);
