@@ -19,6 +19,7 @@ public class Vehicle {
 	private String currentCity;
 	private String availableStatus;
 	private int pricePerKM;
+	private double averageSpeed;
 	
 	@OneToOne
 	@MapsId
@@ -105,8 +106,22 @@ public class Vehicle {
 		this.driver = driver;
 	}
 
+	
+
+	@Override
+	public String toString() {
+		return "Vehicle [id=" + id + ", name=" + name + ", vehicleNo=" + vehicleNo + ", type=" + type + ", model="
+				+ model + ", capacity=" + capacity + ", currentCity=" + currentCity + ", availableStatus="
+				+ availableStatus + ", pricePerKM=" + pricePerKM + ", averageSpeed=" + averageSpeed + ", driver="
+				+ driver + "]";
+	}
+
+	public Vehicle() {
+		super();
+	}
+
 	public Vehicle(int id, String name, String vehicleNo, String type, String model, int capacity, String currentCity,
-			String availableStatus, int pricePerKM, Driver driver) {
+			String availableStatus, int pricePerKM, double averageSpeed, Driver driver) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -117,18 +132,16 @@ public class Vehicle {
 		this.currentCity = currentCity;
 		this.availableStatus = availableStatus;
 		this.pricePerKM = pricePerKM;
+		this.averageSpeed = averageSpeed;
 		this.driver = driver;
 	}
 
-	public Vehicle() {
-		super();
+	public double getAverageSpeed() {
+		return averageSpeed;
 	}
 
-	@Override
-	public String toString() {
-		return "Vehicle [id=" + id + ", name=" + name + ", vehicleNo=" + vehicleNo + ", type=" + type + ", model="
-				+ model + ", capacity=" + capacity + ", currentCity=" + currentCity + ", availableStatus="
-				+ availableStatus + ", pricePerKM=" + pricePerKM + "]";
+	public void setAverageSpeed(double averageSpeed) {
+		this.averageSpeed = averageSpeed;
 	}
 	
 	

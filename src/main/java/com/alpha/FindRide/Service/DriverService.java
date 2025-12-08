@@ -78,6 +78,7 @@ public class DriverService {
         }
 		v.setAvailableStatus("Available");
 		v.setPricePerKM(rdto.getPricePerKM());
+		v.setAverageSpeed(rdto.getAverageSpeed());
 		d.setVehicle(v);
 		
 		vr.save(v);

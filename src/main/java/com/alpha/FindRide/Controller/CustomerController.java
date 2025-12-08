@@ -10,11 +10,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alpha.FindRide.ResponseStructure;
+import com.alpha.FindRide.DTO.AvailableVehicleDTO;
 import com.alpha.FindRide.DTO.FindCustomerDTO;
-import com.alpha.FindRide.DTO.FindDriverDTO;
 import com.alpha.FindRide.DTO.RegisterCustomerDTO;
 import com.alpha.FindRide.Entity.Customer;
-import com.alpha.FindRide.Entity.Driver;
 import com.alpha.FindRide.Service.CustomerService;
 
 @RestController
@@ -40,4 +39,9 @@ public class CustomerController {
 		return cs.deleteCustomer(mobileno);
 	}
 
+	@PostMapping("/seeallAvailableVehicles")
+	public ResponseStructure<AvailableVehicleDTO> seeallAvailableVehicles(@RequestParam long mobileno,@RequestParam String destinationCity)
+	{
+		return cs.seeallAvailableVehicles(mobileno,destinationCity);
+	}
 }
