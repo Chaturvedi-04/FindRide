@@ -13,6 +13,7 @@ public interface VehicleRepo extends JpaRepository<Vehicle, Integer>{
 
 	 @Query("SELECT v FROM Vehicle v " +
 	           "WHERE v.currentCity = :sourceLoc AND v.availableStatus = 'Available'")
+	 
 	public List<Vehicle> findByCurrentCity(String sourceLoc);
 	
 }

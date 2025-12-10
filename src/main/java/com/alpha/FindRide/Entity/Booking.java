@@ -1,10 +1,12 @@
 package com.alpha.FindRide.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+//import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 
 @Entity
@@ -12,91 +14,120 @@ public class Booking {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
-	@ManyToOne
+	@OneToOne
+	@JsonIgnore
 	private Customer cust;
 	@OneToOne
-	private Driver driver;
+	@JsonIgnore
+	private Vehicle vehicle;
 	private String sourceLoc;
 	private String destinationLoc;
 	private double distanceTravelled;
 	private double fare;
-	private String estimatedTime;
+	private double estimatedTime;
 	private String bookingDate;
-//	private Payment payment;
-	public Booking(int id, Customer cust, Driver driver, String sourceLoc, String destinationLoc, double distanceTravelled,
-			double fare, String estimatedTime, String bookingDate) {
+	private String bookingStatus ="AVAILABLE";
+	@OneToOne
+	@JsonIgnore
+	private Payment payment;
+	private String paymentStatuts;
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public Customer getCust() {
+		return cust;
+	}
+	public void setCust(Customer cust) {
+		this.cust = cust;
+	}
+	public Vehicle getVehicle() {
+		return vehicle;
+	}
+	public void setVehicle(Vehicle vehicle) {
+		this.vehicle = vehicle;
+	}
+	public String getSourceLoc() {
+		return sourceLoc;
+	}
+	public void setSourceLoc(String sourceLoc) {
+		this.sourceLoc = sourceLoc;
+	}
+	public String getDestinationLoc() {
+		return destinationLoc;
+	}
+	public void setDestinationLoc(String destinationLoc) {
+		this.destinationLoc = destinationLoc;
+	}
+	public double getDistanceTravelled() {
+		return distanceTravelled;
+	}
+	public void setDistanceTravelled(double distanceTravelled) {
+		this.distanceTravelled = distanceTravelled;
+	}
+	public double getFare() {
+		return fare;
+	}
+	public void setFare(double fare) {
+		this.fare = fare;
+	}
+	public double getEstimatedTime() {
+		return estimatedTime;
+	}
+	public void setEstimatedTime(double estimatedTime) {
+		this.estimatedTime = estimatedTime;
+	}
+	public String getBookingDate() {
+		return bookingDate;
+	}
+	public void setBookingDate(String bookingDate) {
+		this.bookingDate = bookingDate;
+	}
+	public String getBookingStatus() {
+		return bookingStatus;
+	}
+	public void setBookingStatus(String bookingStatus) {
+		this.bookingStatus = bookingStatus;
+	}
+	public Payment getPayment() {
+		return payment;
+	}
+	public void setPayment(Payment payment) {
+		this.payment = payment;
+	}
+	public String getPaymentStatuts() {
+		return paymentStatuts;
+	}
+	public void setPaymentStatuts(String paymentStatuts) {
+		this.paymentStatuts = paymentStatuts;
+	}
+	public Booking(int id, Customer cust, Vehicle vehicle, String sourceLoc, String destinationLoc,
+			double distanceTravelled, double fare, double estimatedTime, String bookingDate, String bookingStatus,
+			Payment payment, String paymentStatuts) {
 		super();
 		this.id = id;
 		this.cust = cust;
-		this.driver = driver;
+		this.vehicle = vehicle;
 		this.sourceLoc = sourceLoc;
 		this.destinationLoc = destinationLoc;
 		this.distanceTravelled = distanceTravelled;
 		this.fare = fare;
 		this.estimatedTime = estimatedTime;
 		this.bookingDate = bookingDate;
+		this.bookingStatus = bookingStatus;
+		this.payment = payment;
+		this.paymentStatuts = paymentStatuts;
 	}
-public Booking() {
-	super();
-}
-public int getId() {
-	return id;
-}
-public void setId(int id) {
-	this.id = id;
-}
-public Customer getCust() {
-	return cust;
-}
-public void setCust(Customer cust) {
-	this.cust = cust;
-}
-public Driver getDriver() {
-	return driver;
-}
-public void setDriver(Driver driver) {
-	this.driver = driver;
-}
-public String getSourceLoc() {
-	return sourceLoc;
-}
-public void setSourceLoc(String sourceLoc) {
-	this.sourceLoc = sourceLoc;
-}
-public String getDestinationLoc() {
-	return destinationLoc;
-}
-public void setDestinationLoc(String destinationLoc) {
-	this.destinationLoc = destinationLoc;
-}
-public double getDistanceTravelled() {
-	return distanceTravelled;
-}
-public void setDistanceTravelled(double distanceTravelled) {
-	this.distanceTravelled = distanceTravelled;
-}
-public double getFare() {
-	return fare;
-}
-public void setFare(double fare) {
-	this.fare = fare;
-}
-public String getEstimatedTime() {
-	return estimatedTime;
-}
-public void setEstimatedTime(String estimatedTime) {
-	this.estimatedTime = estimatedTime;
-}
-public String getBookingDate() {
-	return bookingDate;
-}
-public void setBookingDate(String bookingDate) {
-	this.bookingDate = bookingDate;
-}
-@Override
-public String toString() {
-	return "Booking [id=" + id + ", cust=" + cust + ", driver=" + driver + ", sourceLoc=" + sourceLoc
-			+ ", destinationLoc=" + destinationLoc + ", distanceTravelled=" + distanceTravelled + ", fare=" + fare
-			+ ", estimatedTime=" + estimatedTime + ", bookingDate=" + bookingDate + "]";
-}
+	public Booking() {
+		super();
+	}
+	@Override
+	public String toString() {
+		return "Booking [id=" + id + ", cust=" + cust + ", vehicle=" + vehicle + ", sourceLoc=" + sourceLoc
+				+ ", destinationLoc=" + destinationLoc + ", distanceTravelled=" + distanceTravelled + ", fare=" + fare
+				+ ", estimatedTime=" + estimatedTime + ", bookingDate=" + bookingDate + ", bookingStatus="
+				+ bookingStatus + ", payment=" + payment + ", paymentStatuts=" + paymentStatuts + "]";
+	}	
 }
