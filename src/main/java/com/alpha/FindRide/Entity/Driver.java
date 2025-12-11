@@ -29,7 +29,7 @@ public class Driver {
 	private String mailid;
 	
 	@OneToOne(mappedBy = "driver", cascade = CascadeType.ALL)
-	@JsonIgnore
+//	@JsonIgnore
 	private Vehicle vehicle;
 
 	@OneToMany
@@ -120,8 +120,7 @@ public class Driver {
 	}
 
 	public void setBookingList(List<Booking> bookingList) {
-		this.bookingList = bookingList;
-	}
+ 	}
 
 	public Driver(int id, long licenseNo, String upiid, String name, String status, int age, long mobileno,
 			String gender, String mailid, Vehicle vehicle, List<Booking> bookingList) {
