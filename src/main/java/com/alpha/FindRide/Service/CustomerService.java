@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.alpha.FindRide.ResponseStructure;
+import com.alpha.FindRide.DTO.ActiveBookingDTO;
 import com.alpha.FindRide.DTO.AvailableVehicleDTO;
 import com.alpha.FindRide.DTO.FindCustomerDTO;
 import com.alpha.FindRide.DTO.RegisterCustomerDTO;
@@ -20,6 +21,8 @@ import com.alpha.FindRide.Entity.Customer;
 import com.alpha.FindRide.Entity.Vehicle;
 import com.alpha.FindRide.Exceptions.CustomerNotFoundException;
 import com.alpha.FindRide.Exceptions.InvalidDestinationLocationException;
+import com.alpha.FindRide.Exceptions.NoCurrentBookingException;
+import com.alpha.FindRide.Exceptions.SameSourceAndDestinationException;
 import com.alpha.FindRide.Repository.CustomerRepo;
 import com.alpha.FindRide.Repository.VehicleRepo;
 
@@ -148,6 +151,10 @@ public class CustomerService {
 	        double destLat = destJson.get("lat").asDouble();
 	        double destLon = destJson.get("lon").asDouble();
 	        
+	        // 🚨 NEW STEP: Check if source and destination are the same
+	        if (srcLat == destLat && srcLon == destLon) {
+	            throw new SameSourceAndDestinationException();
+	        }
 
 	        // Step 3: Use Directions API to get distance
 	        String directionUrl = String.format(
@@ -190,13 +197,34 @@ public class CustomerService {
 	}
 
 	public ResponseEntity<ResponseStructure<List<Booking>>> seeBookingHistory(long mobileno) {
-		
-		Customer c= cr.findByMobileno(mobileno);	
-		List<Booking> blist = vr.findAllCompleteBookingsofCustomers(mobileno);
-		ResponseStructure<List<Booking>> rs= new ResponseStructure<List<Booking>>();
+		List<Booking> blist = vr.findAllCompletedBookingsOfCustomer(mobileno);
+		ResponseStructure<List<Booking>> rs = new ResponseStructure<List<Booking>>();
 		rs.setStatuscode(HttpStatus.OK.value());
-		rs.setMessage("Booking list");
+		rs.setMessage("Booking List is Fetched");
 		rs.setData(blist);
 		return new ResponseEntity<ResponseStructure<List<Booking>>>(rs,HttpStatus.OK);
+	}
+
+	public ResponseEntity<ResponseStructure<ActiveBookingDTO>> seeActiveBooking(long mobileno) {
+		Customer c = cr.findByMobileno(mobileno);
+	    if (c == null) {
+	        throw new CustomerNotFoundException();
+	    }
+	    Booking b = vr.findActiveBookingOfCustomer(mobileno);
+	    if(b==null)
+	    {
+	    	throw new NoCurrentBookingException();
+	    }
+	    ActiveBookingDTO abdto = new ActiveBookingDTO();
+	    abdto.setBooking(b);
+	    abdto.setCustname(c.getName());
+	    abdto.setCustmobno(mobileno);
+	    abdto.setCurrentlocation(c.getCurrentloc());
+	    
+	    ResponseStructure<ActiveBookingDTO> rs = new ResponseStructure<ActiveBookingDTO>();
+		rs.setStatuscode(HttpStatus.OK.value());
+		rs.setMessage("Current Booking is Fetched");
+		rs.setData(abdto);
+		return new ResponseEntity<ResponseStructure<ActiveBookingDTO>>(rs,HttpStatus.OK);
 	}
 }

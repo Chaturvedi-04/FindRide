@@ -1,19 +1,26 @@
 package com.alpha.FindRide.Service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.alpha.FindRide.ResponseStructure;
+import com.alpha.FindRide.DTO.ActiveBookingDriverDTO;
 import com.alpha.FindRide.DTO.FindDriverDTO;
 import com.alpha.FindRide.DTO.RegisterDriverVehicleDTO;
 import com.alpha.FindRide.DTO.UpdateLocationDTO;
+import com.alpha.FindRide.Entity.Booking;
 import com.alpha.FindRide.Entity.Driver;
 import com.alpha.FindRide.Entity.Vehicle;
 import com.alpha.FindRide.Exceptions.DriverNotFoundException;
 import com.alpha.FindRide.Exceptions.LocationFetchException;
+import com.alpha.FindRide.Exceptions.NoCurrentBookingException;
+import com.alpha.FindRide.Exceptions.VehicleNotFoundException;
 import com.alpha.FindRide.Repository.DriverRepo;
 import com.alpha.FindRide.Repository.VehicleRepo;
 
@@ -33,7 +40,7 @@ public class DriverService {
 	@Autowired
 	private VehicleRepo vr;
 
-	public ResponseStructure<Driver> saveDriver(RegisterDriverVehicleDTO rdto) {
+	public ResponseEntity<ResponseStructure<Driver>> saveDriver(RegisterDriverVehicleDTO rdto) {
 		
 		Driver d = new Driver();
 		d.setLicenseNo(rdto.getLicenseNo());
@@ -87,10 +94,10 @@ public class DriverService {
 		rs.setStatuscode(HttpStatus.CREATED.value());
 		rs.setMessage("Driver is saved");
 		rs.setData(d);
-		return rs;
+		return new ResponseEntity<ResponseStructure<Driver>>(rs,HttpStatus.CREATED);
 	}
 	
-	public ResponseStructure<Driver> findDriver(FindDriverDTO fdto) {
+	public ResponseEntity<ResponseStructure<Driver>> findDriver(FindDriverDTO fdto) {
 	    Driver d = dr.findByMobileno(fdto.getMobileno());
 	    if (d == null) {
 	        throw new DriverNotFoundException();
@@ -100,10 +107,10 @@ public class DriverService {
         rs.setMessage("Driver with MobileNo " + fdto.getMobileno() + " found");
         rs.setData(d);
 
-        return rs;
+        return new ResponseEntity<ResponseStructure<Driver>>(rs,HttpStatus.FOUND);
 	}
 
-	public ResponseStructure<Driver> updateLocation(UpdateLocationDTO udto) {
+	public ResponseEntity<ResponseStructure<Driver>> updateLocation(UpdateLocationDTO udto) {
 
 		    Driver d = dr.findByMobileno(udto.getMobileno());
 		    if (d == null) {
@@ -141,11 +148,11 @@ public class DriverService {
 		    rs.setStatuscode(HttpStatus.OK.value());
 		    rs.setMessage("Driver updated successfully");
 		    rs.setData(d);
-		    return rs;
+		    return new ResponseEntity<ResponseStructure<Driver>>(rs,HttpStatus.OK);
 
 	}
 
-	public ResponseStructure<String> deleteDriver(long mobileno) {
+	public ResponseEntity<ResponseStructure<String>> deleteDriver(long mobileno) {
 		Driver d = dr.findByMobileno(mobileno);
 		if(d!=null) {
 			dr.delete(d);
@@ -158,8 +165,43 @@ public class DriverService {
 	    rs.setMessage("Driver deleted");
 	    rs.setData("Driver with MobileNo " + mobileno + " removed");
 
-	    return rs;
+	    return new ResponseEntity<ResponseStructure<String>>(rs,HttpStatus.OK);
+	}
+
+	public ResponseEntity<ResponseStructure<List<Booking>>> seeBookingHistory(long mobileno) {
+		List<Booking> blist = vr.findAllCompletedBookingsOfDriver(mobileno);
+		ResponseStructure<List<Booking>> rs = new ResponseStructure<List<Booking>>();
+		rs.setStatuscode(HttpStatus.OK.value());
+		rs.setMessage("Booking List is Fetched");
+		rs.setData(blist);
+		return new ResponseEntity<ResponseStructure<List<Booking>>>(rs,HttpStatus.OK);
 	}
 	
+	public ResponseEntity<ResponseStructure<ActiveBookingDriverDTO>> seeActiveBooking(long mobileno) {
+		Driver d = dr.findByMobileno(mobileno);
+	    if (d == null) {
+	        throw new DriverNotFoundException();
+	    }
+	    Vehicle v = vr.findById(d.getId()).get();
+	    if (v == null) {
+	    	throw new VehicleNotFoundException();
+	    }
+	    Booking b = vr.findActiveBookingOfDriver(mobileno);
+	    if(b==null)
+	    {
+	    	throw new NoCurrentBookingException();
+	    }
+	    ActiveBookingDriverDTO abddto = new ActiveBookingDriverDTO();
+	    abddto.setBooking(b);
+	    abddto.setDrivername(d.getName());
+	    abddto.setDrivermobno(mobileno);
+	    abddto.setCurrentlocation(v.getCurrentCity());
+	    
+	    ResponseStructure<ActiveBookingDriverDTO> rs = new ResponseStructure<ActiveBookingDriverDTO>();
+		rs.setStatuscode(HttpStatus.OK.value());
+		rs.setMessage("Current Booking is Fetched");
+		rs.setData(abddto);
+		return new ResponseEntity<ResponseStructure<ActiveBookingDriverDTO>>(rs,HttpStatus.OK);
+	}
 	
 }

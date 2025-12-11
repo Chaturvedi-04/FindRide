@@ -3,13 +3,15 @@ package com.alpha.FindRide.Entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 
 @Entity
 public class Payment {
-
 	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
 	@OneToOne
 	@JsonIgnore
@@ -21,7 +23,7 @@ public class Payment {
 	@JsonIgnore
 	private Booking booking;
 	private double amount;
-	private String paymenType;
+	private String paymentType;
 	public int getId() {
 		return id;
 	}
@@ -52,20 +54,20 @@ public class Payment {
 	public void setAmount(double amount) {
 		this.amount = amount;
 	}
-	public String getPaymenType() {
-		return paymenType;
+	public String getPaymentType() {
+		return paymentType;
 	}
-	public void setPaymenType(String paymenType) {
-		this.paymenType = paymenType;
+	public void setPaymentType(String paymentType) {
+		this.paymentType = paymentType;
 	}
-	public Payment(int id, Customer customer, Vehicle vehicle, Booking booking, double amount, String paymenType) {
+	public Payment(int id, Customer customer, Vehicle vehicle, Booking booking, double amount, String paymentType) {
 		super();
 		this.id = id;
 		this.customer = customer;
 		this.vehicle = vehicle;
 		this.booking = booking;
 		this.amount = amount;
-		this.paymenType = paymenType;
+		this.paymentType = paymentType;
 	}
 	public Payment() {
 		super();
@@ -73,7 +75,6 @@ public class Payment {
 	@Override
 	public String toString() {
 		return "Payment [id=" + id + ", customer=" + customer + ", vehicle=" + vehicle + ", booking=" + booking
-				+ ", amount=" + amount + ", paymenType=" + paymenType + "]";
+				+ ", amount=" + amount + ", paymentType=" + paymentType + "]";
 	}
-	
 }

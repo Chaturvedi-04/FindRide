@@ -6,7 +6,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-//import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 
 @Entity
@@ -14,23 +13,30 @@ public class Booking {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
+	
 	@OneToOne
 	@JsonIgnore
 	private Customer cust;
+	
+	@OneToOne
+	@JsonIgnore
+	private Driver driver;
+	
 	@OneToOne
 	@JsonIgnore
 	private Vehicle vehicle;
+	
 	private String sourceLoc;
 	private String destinationLoc;
 	private double distanceTravelled;
 	private double fare;
 	private double estimatedTime;
 	private String bookingDate;
-	private String bookingStatus ="AVAILABLE";
+	private String paymentStatus;
 	@OneToOne
 	@JsonIgnore
 	private Payment payment;
-	private String paymentStatuts;
+	private String bookingStatus="AVAILABLE";
 	public int getId() {
 		return id;
 	}
@@ -42,6 +48,12 @@ public class Booking {
 	}
 	public void setCust(Customer cust) {
 		this.cust = cust;
+	}
+	public Driver getDriver() {
+		return driver;
+	}
+	public void setDriver(Driver driver) {
+		this.driver = driver;
 	}
 	public Vehicle getVehicle() {
 		return vehicle;
@@ -85,11 +97,11 @@ public class Booking {
 	public void setBookingDate(String bookingDate) {
 		this.bookingDate = bookingDate;
 	}
-	public String getBookingStatus() {
-		return bookingStatus;
+	public String getPaymentStatus() {
+		return paymentStatus;
 	}
-	public void setBookingStatus(String bookingStatus) {
-		this.bookingStatus = bookingStatus;
+	public void setPaymentStatus(String paymentStatus) {
+		this.paymentStatus = paymentStatus;
 	}
 	public Payment getPayment() {
 		return payment;
@@ -97,18 +109,19 @@ public class Booking {
 	public void setPayment(Payment payment) {
 		this.payment = payment;
 	}
-	public String getPaymentStatuts() {
-		return paymentStatuts;
+	public String getBookingStatus() {
+		return bookingStatus;
 	}
-	public void setPaymentStatuts(String paymentStatuts) {
-		this.paymentStatuts = paymentStatuts;
+	public void setBookingStatus(String bookingStatus) {
+		this.bookingStatus = bookingStatus;
 	}
-	public Booking(int id, Customer cust, Vehicle vehicle, String sourceLoc, String destinationLoc,
-			double distanceTravelled, double fare, double estimatedTime, String bookingDate, String bookingStatus,
-			Payment payment, String paymentStatuts) {
+	public Booking(int id, Customer cust, Driver driver, Vehicle vehicle, String sourceLoc, String destinationLoc,
+			double distanceTravelled, double fare, double estimatedTime, String bookingDate, String paymentStatus,
+			Payment payment, String bookingStatus) {
 		super();
 		this.id = id;
 		this.cust = cust;
+		this.driver = driver;
 		this.vehicle = vehicle;
 		this.sourceLoc = sourceLoc;
 		this.destinationLoc = destinationLoc;
@@ -116,18 +129,19 @@ public class Booking {
 		this.fare = fare;
 		this.estimatedTime = estimatedTime;
 		this.bookingDate = bookingDate;
-		this.bookingStatus = bookingStatus;
+		this.paymentStatus = paymentStatus;
 		this.payment = payment;
-		this.paymentStatuts = paymentStatuts;
+		this.bookingStatus = bookingStatus;
 	}
 	public Booking() {
 		super();
 	}
 	@Override
 	public String toString() {
-		return "Booking [id=" + id + ", cust=" + cust + ", vehicle=" + vehicle + ", sourceLoc=" + sourceLoc
-				+ ", destinationLoc=" + destinationLoc + ", distanceTravelled=" + distanceTravelled + ", fare=" + fare
-				+ ", estimatedTime=" + estimatedTime + ", bookingDate=" + bookingDate + ", bookingStatus="
-				+ bookingStatus + ", payment=" + payment + ", paymentStatuts=" + paymentStatuts + "]";
-	}	
+		return "Booking [id=" + id + ", cust=" + cust + ", driver=" + driver + ", vehicle=" + vehicle + ", sourceLoc="
+				+ sourceLoc + ", destinationLoc=" + destinationLoc + ", distanceTravelled=" + distanceTravelled
+				+ ", fare=" + fare + ", estimatedTime=" + estimatedTime + ", bookingDate=" + bookingDate
+				+ ", paymentStatus=" + paymentStatus + ", payment=" + payment + ", bookingStatus=" + bookingStatus
+				+ "]";
+	}
 }

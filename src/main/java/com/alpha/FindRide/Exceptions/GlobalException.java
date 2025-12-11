@@ -1,6 +1,7 @@
 package com.alpha.FindRide.Exceptions;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -10,52 +11,76 @@ import com.alpha.FindRide.ResponseStructure;
 public class GlobalException {
 
     @ExceptionHandler(DriverNotFoundException.class)
-    public ResponseStructure<String> driverNotFound(DriverNotFoundException ex) {
+    public ResponseEntity<ResponseStructure<String>> driverNotFound(DriverNotFoundException ex) {
 		ResponseStructure<String> rs = new ResponseStructure<String>();
 		rs.setStatuscode(HttpStatus.NOT_FOUND.value());
 		rs.setMessage("Driver NOT FOUND");
 		rs.setData("Driver NOT FOUND");
-		return rs;
+		return new ResponseEntity<ResponseStructure<String>>(rs,HttpStatus.NOT_FOUND);
+    }
+    
+    @ExceptionHandler(VehicleNotFoundException.class)
+    public ResponseEntity<ResponseStructure<String>> vehicleNotFound(VehicleNotFoundException ex) {
+    	ResponseStructure<String> rs = new ResponseStructure<String>();
+    	rs.setStatuscode(HttpStatus.NOT_FOUND.value());
+    	rs.setMessage("Vehicle NOT FOUND");
+    	rs.setData("Vehicle NOT FOUND");
+    	return new ResponseEntity<ResponseStructure<String>>(rs,HttpStatus.NOT_FOUND);
     }
     
     @ExceptionHandler(CustomerNotFoundException.class)
-    public ResponseStructure<String> customerNotFound(CustomerNotFoundException ex) {
+    public ResponseEntity<ResponseStructure<String>> customerNotFound(CustomerNotFoundException ex) {
 		ResponseStructure<String> rs = new ResponseStructure<String>();
 		rs.setStatuscode(HttpStatus.NOT_FOUND.value());
 		rs.setMessage("Customer NOT FOUND");
 		rs.setData("Customer NOT FOUND");
-		return rs;
+		return new ResponseEntity<ResponseStructure<String>>(rs,HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(LocationFetchException.class)
-    public ResponseStructure<String> locationException(LocationFetchException ex) {
+    public ResponseEntity<ResponseStructure<String>> locationException(LocationFetchException ex) {
 
-        ResponseStructure<String> response = new ResponseStructure<>();
-        response.setStatuscode(HttpStatus.BAD_GATEWAY.value());
-        response.setMessage(ex.getMessage());
-        response.setData(null);
-
-        return response;
+        ResponseStructure<String> rs = new ResponseStructure<>();
+        rs.setStatuscode(HttpStatus.BAD_GATEWAY.value());
+        rs.setMessage(ex.getMessage());
+        rs.setData(null);
+        return new ResponseEntity<ResponseStructure<String>>(rs,HttpStatus.BAD_GATEWAY);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseStructure<String> global(Exception ex) {
+    public ResponseEntity<ResponseStructure<String>> global(Exception ex) {
 
-        ResponseStructure<String> response = new ResponseStructure<>();
-        response.setStatuscode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        response.setMessage(ex.getMessage());
-        response.setData(null);
-
-        return response;
+        ResponseStructure<String> rs = new ResponseStructure<>();
+        rs.setStatuscode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        rs.setMessage(ex.getMessage());
+        rs.setData(null);
+        return new ResponseEntity<ResponseStructure<String>>(rs,HttpStatus.INTERNAL_SERVER_ERROR);
     }
     
     @ExceptionHandler(InvalidDestinationLocationException.class)
-    public ResponseStructure<String> invalidDestinationException(InvalidDestinationLocationException ex) {
-        ResponseStructure<String> response = new ResponseStructure<String>();
-        response.setStatuscode(HttpStatus.BAD_GATEWAY.value());
-        response.setMessage(ex.getMessage());
-        response.setData(null);
-        
-        return response;
+    public ResponseEntity<ResponseStructure<String>> invalidDestinationException(InvalidDestinationLocationException ex) {
+        ResponseStructure<String> rs = new ResponseStructure<String>();
+        rs.setStatuscode(HttpStatus.BAD_GATEWAY.value());
+        rs.setMessage(ex.getMessage());
+        rs.setData(null);
+        return new ResponseEntity<ResponseStructure<String>>(rs,HttpStatus.BAD_GATEWAY);
+    }
+    
+    @ExceptionHandler(NoCurrentBookingException.class)
+    public ResponseEntity<ResponseStructure<String>> NoCurrentBookingException(NoCurrentBookingException ex) {
+    	ResponseStructure<String> rs = new ResponseStructure<String>();
+    	rs.setStatuscode(HttpStatus.NOT_FOUND.value());
+    	rs.setMessage("No Current Booking");
+    	rs.setData(null);
+    	return new ResponseEntity<ResponseStructure<String>>(rs,HttpStatus.NOT_FOUND);
+    }
+    
+    @ExceptionHandler(SameSourceAndDestinationException.class)
+    public ResponseEntity<ResponseStructure<String>> sameSourceAndDestinationException(SameSourceAndDestinationException ex) {
+    	ResponseStructure<String> rs = new ResponseStructure<String>();
+    	rs.setStatuscode(HttpStatus.NOT_ACCEPTABLE.value());
+    	rs.setMessage("Source and destination cannot be the same");
+    	rs.setData(null);
+    	return new ResponseEntity<ResponseStructure<String>>(rs,HttpStatus.NOT_ACCEPTABLE);
     }
 }

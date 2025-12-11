@@ -2,6 +2,8 @@
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,8 +23,9 @@ public class Customer {
 	private long mobileno;
 	private String emailid;
 	private String currentloc;
-	private boolean bookingStatus;
+	private boolean bookingStatus=false;
 	@OneToMany(mappedBy = "cust", cascade = CascadeType.ALL)
+	@JsonIgnore
 	private List<Booking> bookingList;
 	public int getId() {
 		return id;
@@ -66,7 +69,7 @@ public class Customer {
 	public void setCurrentloc(String currentloc) {
 		this.currentloc = currentloc;
 	}
-	public boolean isBookingStatus() {
+	public boolean getBookingStatus() {
 		return bookingStatus;
 	}
 	public void setBookingStatus(boolean bookingStatus) {
@@ -100,5 +103,4 @@ public class Customer {
 				+ mobileno + ", emailid=" + emailid + ", currentloc=" + currentloc + ", bookingStatus=" + bookingStatus
 				+ ", bookingList=" + bookingList + "]";
 	}
-	
 }

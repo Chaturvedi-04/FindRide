@@ -1,30 +1,36 @@
 package com.alpha.FindRide.DTO;
 
 public class BookingDTO {
-
-	private int vehicleId;
-	private String sourceLocation;
-	private String destinationLocation;
+	
+	private int vehicleid;
+	private String sourceLoc;
+	private String destinationLoc;
+	private double distanceTravelled;
 	private double fare;
-	private double distanceEstimated;
 	private double estimatedTime;
-	public int getVehicleId() {
-		return vehicleId;
+	public int getVehicleid() {
+		return vehicleid;
 	}
-	public void setVehicleId(int vehicleId) {
-		this.vehicleId = vehicleId;
+	public void setVehicleid(int vehicleid) {
+		this.vehicleid = vehicleid;
 	}
-	public String getSourceLocation() {
-		return sourceLocation;
+	public String getSourceLoc() {
+		return sourceLoc;
 	}
-	public void setSourceLocation(String sourceLocation) {
-		this.sourceLocation = sourceLocation;
+	public void setSourceLoc(String sourceLoc) {
+		this.sourceLoc = sourceLoc;
 	}
-	public String getDestinationLocation() {
-		return destinationLocation;
+	public String getDestinationLoc() {
+		return destinationLoc;
 	}
-	public void setDestinationLocation(String destinationLocation) {
-		this.destinationLocation = destinationLocation;
+	public void setDestinationLoc(String destinationLoc) {
+		this.destinationLoc = destinationLoc;
+	}
+	public double getDistanceTravelled() {
+		return distanceTravelled;
+	}
+	public void setDistanceTravelled(double distanceTravelled) {
+		this.distanceTravelled = distanceTravelled;
 	}
 	public double getFare() {
 		return fare;
@@ -32,35 +38,29 @@ public class BookingDTO {
 	public void setFare(double fare) {
 		this.fare = fare;
 	}
-	public double getDistanceEstimated() {
-		return distanceEstimated;
-	}
-	public void setDistanceEstimated(double distanceEstimated) {
-		this.distanceEstimated = distanceEstimated;
-	}
 	public double getEstimatedTime() {
 		return estimatedTime;
 	}
 	public void setEstimatedTime(double estimatedTime) {
 		this.estimatedTime = estimatedTime;
 	}
-	public BookingDTO(int vehicleId, String sourceLocation, String destinationLocation, double fare,
-			double distanceEstimated, double estimatedTime) {
+	public BookingDTO(int vehicleid, String sourceLoc, String destinationLoc, double distanceTravelled, double fare,
+			double estimatedTime) {
 		super();
-		this.vehicleId = vehicleId;
-		this.sourceLocation = sourceLocation;
-		this.destinationLocation = destinationLocation;
+		this.vehicleid = vehicleid;
+		this.sourceLoc = sourceLoc;
+		this.destinationLoc = destinationLoc;
+		this.distanceTravelled = distanceTravelled;
 		this.fare = fare;
-		this.distanceEstimated = distanceEstimated;
 		this.estimatedTime = estimatedTime;
-	}
-	@Override
-	public String toString() {
-		return "BookingDTO [vehicleId=" + vehicleId + ", sourceLocation=" + sourceLocation + ", destinationLocation="
-				+ destinationLocation + ", fare=" + fare + ", distanceEstimated=" + distanceEstimated
-				+ ", estimatedTime=" + estimatedTime + "]";
 	}
 	public BookingDTO() {
 		super();
-	}	
+	}
+	@Override
+	public String toString() {
+		return "BookingDTO [vehicleid=" + vehicleid + ", sourceLoc=" + sourceLoc + ", destinationLoc=" + destinationLoc
+				+ ", distanceTravelled=" + distanceTravelled + ", fare=" + fare + ", estimatedTime=" + estimatedTime
+				+ "]";
+	}
 }

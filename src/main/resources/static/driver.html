@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>FindRide · Driver</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">FindRide</div>
+    <nav>
+      <a href="/index.html">Home</a>
+      <a href="/customer.html">Customer</a>
+      <a href="/driver.html" class="active">Driver</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <h2>Driver Console</h2>
+
+    <section class="split">
+      <div class="panel">
+        <h3>Register Driver & Vehicle</h3>
+        <form id="registerDriverForm">
+          <input name="licenseNo" placeholder="License No" />
+          <input name="upiid" placeholder="UPI ID" />
+          <input name="driverName" placeholder="Driver name" required />
+          <input name="age" type="number" placeholder="Age" />
+          <input name="mobileno" placeholder="Mobile number" required />
+          <input name="gender" placeholder="Gender" />
+          <input name="mailid" placeholder="Email" />
+          <input name="vehicleName" placeholder="Vehicle name" />
+          <input name="vehicleNo" placeholder="Vehicle no (plate)" />
+          <input name="vehicleType" placeholder="Vehicle type (car/bike)" />
+          <input name="model" placeholder="Model" />
+          <input name="vehicleCapacity" type="number" placeholder="Capacity" />
+          <input name="latitude" placeholder="Latitude" required />
+          <input name="longitude" placeholder="Longitude" required />
+          <input name="pricePerKM" type="number" placeholder="Price per KM" />
+          <input name="averageSpeed" type="number" placeholder="Average speed (km/h)" />
+          <button class="btn" type="submit">Save Driver</button>
+        </form>
+        <pre id="registerDriverResult" class="result"></pre>
+      </div>
+
+      <div class="panel">
+        <h3>Find / Update / Delete</h3>
+        <form id="findDriverForm">
+          <input name="mobileno" placeholder="Mobile number" required />
+          <button class="btn" type="submit">Find Driver</button>
+        </form>
+
+        <form id="updateLocationForm" style="margin-top:12px">
+          <input name="mobileno" placeholder="Driver mobile no" required />
+          <input name="latitude" placeholder="Latitude" required />
+          <input name="longitude" placeholder="Longitude" required />
+          <button class="btn" type="submit">Update Location</button>
+        </form>
+
+        <div style="margin-top:12px">
+          <input id="deleteDriverMobileno" placeholder="Mobile number to delete" />
+          <button id="deleteDriverBtn" class="btn ghost">Delete Driver</button>
+        </div>
+
+        <pre id="driverOpsResult" class="result"></pre>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">© FindRide</footer>
+  <script src="/js/app.js"></script>
+</body>
+</html>

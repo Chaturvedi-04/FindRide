@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.alpha.FindRide.Entity.Booking;
 
 @Repository
-public interface BookingRepo extends JpaRepository<Booking, Integer>  {
+public interface BookingRepo extends JpaRepository<Booking, Integer>{
 
 }
