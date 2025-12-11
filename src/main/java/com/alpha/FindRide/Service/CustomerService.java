@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -14,6 +15,7 @@ import com.alpha.FindRide.DTO.AvailableVehicleDTO;
 import com.alpha.FindRide.DTO.FindCustomerDTO;
 import com.alpha.FindRide.DTO.RegisterCustomerDTO;
 import com.alpha.FindRide.DTO.VehicleDetailDTO;
+import com.alpha.FindRide.Entity.Booking;
 import com.alpha.FindRide.Entity.Customer;
 import com.alpha.FindRide.Entity.Vehicle;
 import com.alpha.FindRide.Exceptions.CustomerNotFoundException;
@@ -36,7 +38,7 @@ public class CustomerService {
 	@Autowired
 	private VehicleRepo vr;
 
-	public ResponseStructure<Customer> saveCustomer(RegisterCustomerDTO rdto) {
+	public ResponseEntity<ResponseStructure<Customer>> saveCustomer(RegisterCustomerDTO rdto) {
 		Customer c = new Customer();
 		c.setName(rdto.getName());
 		c.setAge(rdto.getAge());
@@ -70,10 +72,10 @@ public class CustomerService {
 		rs.setStatuscode(HttpStatus.CREATED.value());
 		rs.setMessage("Customer is saved");
 		rs.setData(c);
-		return rs;
+		return new ResponseEntity<ResponseStructure<Customer>>(rs,HttpStatus.CREATED);
 	}
 
-	public ResponseStructure<Customer> findCustomer(FindCustomerDTO cdto) {
+	public ResponseEntity<ResponseStructure<Customer>> findCustomer(FindCustomerDTO cdto) {
 		Customer c = cr.findByMobileno(cdto.getMobileno());
 		if(c==null)
 		{
@@ -84,10 +86,10 @@ public class CustomerService {
         rs.setMessage("Customer with MobileNo " + cdto.getMobileno() + " found");
         rs.setData(c);
 
-        return rs;
+        return new ResponseEntity<ResponseStructure<Customer>>(rs,HttpStatus.FOUND);
 	}
 	
-	public ResponseStructure<String> deleteCustomer(long mobileno){
+	public ResponseEntity<ResponseStructure<String>> deleteCustomer(long mobileno){
 		Customer c = cr.findByMobileno(mobileno);
 		if(c == null) {
 			throw new CustomerNotFoundException();
@@ -97,10 +99,10 @@ public class CustomerService {
 	    rs.setStatuscode(HttpStatus.OK.value());
 	    rs.setMessage("Customer deleted");
 	    rs.setData("Customer with MobileNo " + mobileno + " removed");
-	    return rs;
+	    return new ResponseEntity<ResponseStructure<String>>(rs,HttpStatus.OK);
 	}
 
-	public ResponseStructure<AvailableVehicleDTO> seeallAvailableVehicles(long mobileno, String destinationCity) {
+	public ResponseEntity<ResponseStructure<AvailableVehicleDTO>> seeallAvailableVehicles(long mobileno, String destinationCity) {
 		
 		Customer c = cr.findByMobileno(mobileno);
 	    if (c == null) {
@@ -109,6 +111,10 @@ public class CustomerService {
 		String sourceLoc = c.getCurrentloc();
 		String destionationLoc = destinationCity;
 		double distance;
+//		if(sourceLoc == destionationLoc)
+//		{
+//			throw new SameSourcedestinationLocationException();
+//		}
 
 	    try {
 	        RestTemplate restTemplate = new RestTemplate();
@@ -180,6 +186,17 @@ public class CustomerService {
 	    rs.setStatuscode(HttpStatus.ACCEPTED.value());
 	    rs.setMessage("Available Cars");
 	    rs.setData(avd);
-	    return rs;
+	    return new ResponseEntity<ResponseStructure<AvailableVehicleDTO>>(rs,HttpStatus.ACCEPTED);
+	}
+
+	public ResponseEntity<ResponseStructure<List<Booking>>> seeBookingHistory(long mobileno) {
+		
+		Customer c= cr.findByMobileno(mobileno);	
+		List<Booking> blist = vr.findAllCompleteBookingsofCustomers(mobileno);
+		ResponseStructure<List<Booking>> rs= new ResponseStructure<List<Booking>>();
+		rs.setStatuscode(HttpStatus.OK.value());
+		rs.setMessage("Booking list");
+		rs.setData(blist);
+		return new ResponseEntity<ResponseStructure<List<Booking>>>(rs,HttpStatus.OK);
 	}
 }

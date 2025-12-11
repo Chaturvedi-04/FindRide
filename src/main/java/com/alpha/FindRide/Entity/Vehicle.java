@@ -1,5 +1,7 @@
 package com.alpha.FindRide.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -23,6 +25,7 @@ public class Vehicle {
 	
 	@OneToOne
 	@MapsId
+	@JsonIgnore
 	@JoinColumn(name = "driver_id")
 	private Driver driver;
 

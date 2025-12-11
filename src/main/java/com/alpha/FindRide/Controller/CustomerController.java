@@ -1,6 +1,9 @@
 package com.alpha.FindRide.Controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +16,7 @@ import com.alpha.FindRide.ResponseStructure;
 import com.alpha.FindRide.DTO.AvailableVehicleDTO;
 import com.alpha.FindRide.DTO.FindCustomerDTO;
 import com.alpha.FindRide.DTO.RegisterCustomerDTO;
+import com.alpha.FindRide.Entity.Booking;
 import com.alpha.FindRide.Entity.Customer;
 import com.alpha.FindRide.Service.CustomerService;
 
@@ -43,5 +47,11 @@ public class CustomerController {
 	public ResponseStructure<AvailableVehicleDTO> seeallAvailableVehicles(@RequestParam long mobileno,@RequestParam String destinationCity)
 	{
 		return cs.seeallAvailableVehicles(mobileno,destinationCity);
+	}
+	
+	@PostMapping("/seeBookingHistory")
+	public  ResponseEntity<ResponseStructure<List<Booking>>> seeBookingHistory(@RequestParam long mobileno)
+	{
+		return cs.seeBookingHistory(mobileno);
 	}
 }
