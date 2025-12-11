@@ -25,9 +25,6 @@ public class Driver {
 	private String gender;
 	private String mailid;
 	
-	@OneToMany
-	private List<Booking> bookingList;
-	
 	@OneToOne(mappedBy = "driver", cascade = CascadeType.ALL)
 	private Vehicle vehicle;
 
@@ -106,14 +103,6 @@ public class Driver {
 		this.mailid = mailid;
 	}
 
-	public List<Booking> getBookingList() {
-		return bookingList;
-	}
-
-	public void setBookingList(List<Booking> bookingList) {
-		this.bookingList = bookingList;
-	}
-
 	public Vehicle getVehicle() {
 		return vehicle;
 	}
@@ -127,10 +116,11 @@ public class Driver {
 	}
 
 	public void setBookingList(List<Booking> bookingList) {
- 	}
+		this.bookingList = bookingList;
+	}
 
 	public Driver(int id, long licenseNo, String upiid, String name, String status, int age, long mobileno,
-			String gender, String mailid, List<Booking> bookingList, Vehicle vehicle) {
+			String gender, String mailid, Vehicle vehicle, List<Booking> bookingList) {
 		super();
 		this.id = id;
 		this.licenseNo = licenseNo;
@@ -141,7 +131,6 @@ public class Driver {
 		this.mobileno = mobileno;
 		this.gender = gender;
 		this.mailid = mailid;
-		this.bookingList = bookingList;
 		this.vehicle = vehicle;
 		this.bookingList = bookingList;
 	}
@@ -154,6 +143,8 @@ public class Driver {
 	public String toString() {
 		return "Driver [id=" + id + ", licenseNo=" + licenseNo + ", upiid=" + upiid + ", name=" + name + ", status="
 				+ status + ", age=" + age + ", mobileno=" + mobileno + ", gender=" + gender + ", mailid=" + mailid
-				+ ", bookingList=" + bookingList + ", vehicle=" + vehicle + "]";
+				+ ", vehicle=" + vehicle + ", bookingList=" + bookingList + "]";
 	}
+
+	
 }
