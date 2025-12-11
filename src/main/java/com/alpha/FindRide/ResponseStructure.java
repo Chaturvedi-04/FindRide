@@ -36,7 +36,4 @@ public class ResponseStructure <T>{
 	public String toString() {
 		return "ResponseStructure [statuscode=" + statuscode + ", message=" + message + ", data=" + data + "]";
 	}
-	
-	
-
 }

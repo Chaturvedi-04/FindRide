@@ -2,6 +2,8 @@ package com.alpha.FindRide.Entity;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,23 +23,10 @@ public class Customer {
 	private long mobileno;
 	private String emailid;
 	private String currentloc;
+	private boolean bookingStatus=false;
 	@OneToMany(mappedBy = "cust", cascade = CascadeType.ALL)
+	@JsonIgnore
 	private List<Booking> bookingList;
-	public Customer(int id, String name, int age, String gender, long mobileno, String emailid, String currentloc,
-			List<Booking> bookingList) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.age = age;
-		this.gender = gender;
-		this.mobileno = mobileno;
-		this.emailid = emailid;
-		this.currentloc = currentloc;
-		this.bookingList = bookingList;
-	}
-	public Customer() {
-		super();
-	}
 	public int getId() {
 		return id;
 	}
@@ -80,19 +69,38 @@ public class Customer {
 	public void setCurrentloc(String currentloc) {
 		this.currentloc = currentloc;
 	}
+	public boolean getBookingStatus() {
+		return bookingStatus;
+	}
+	public void setBookingStatus(boolean bookingStatus) {
+		this.bookingStatus = bookingStatus;
+	}
 	public List<Booking> getBookingList() {
 		return bookingList;
 	}
 	public void setBookingList(List<Booking> bookingList) {
 		this.bookingList = bookingList;
 	}
+	public Customer(int id, String name, int age, String gender, long mobileno, String emailid, String currentloc,
+			boolean bookingStatus, List<Booking> bookingList) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.age = age;
+		this.gender = gender;
+		this.mobileno = mobileno;
+		this.emailid = emailid;
+		this.currentloc = currentloc;
+		this.bookingStatus = bookingStatus;
+		this.bookingList = bookingList;
+	}
+	public Customer() {
+		super();
+	}
 	@Override
 	public String toString() {
 		return "Customer [id=" + id + ", name=" + name + ", age=" + age + ", gender=" + gender + ", mobileno="
-				+ mobileno + ", emailid=" + emailid + ", currentloc=" + currentloc + ", bookingList=" + bookingList
-				+ "]";
+				+ mobileno + ", emailid=" + emailid + ", currentloc=" + currentloc + ", bookingStatus=" + bookingStatus
+				+ ", bookingList=" + bookingList + "]";
 	}
-	
-	
-
 }

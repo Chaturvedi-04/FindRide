@@ -1,12 +1,13 @@
 package com.alpha.FindRide.Entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 
 @Entity
@@ -24,8 +25,10 @@ public class Driver {
 	private String gender;
 	private String mailid;
 	
+	@OneToMany
+	private List<Booking> bookingList;
+	
 	@OneToOne(mappedBy = "driver", cascade = CascadeType.ALL)
-	@JsonIgnore
 	private Vehicle vehicle;
 
 	public int getId() {
@@ -100,6 +103,14 @@ public class Driver {
 		this.mailid = mailid;
 	}
 
+	public List<Booking> getBookingList() {
+		return bookingList;
+	}
+
+	public void setBookingList(List<Booking> bookingList) {
+		this.bookingList = bookingList;
+	}
+
 	public Vehicle getVehicle() {
 		return vehicle;
 	}
@@ -109,7 +120,7 @@ public class Driver {
 	}
 
 	public Driver(int id, long licenseNo, String upiid, String name, String status, int age, long mobileno,
-			String gender, String mailid, Vehicle vehicle) {
+			String gender, String mailid, List<Booking> bookingList, Vehicle vehicle) {
 		super();
 		this.id = id;
 		this.licenseNo = licenseNo;
@@ -120,10 +131,10 @@ public class Driver {
 		this.mobileno = mobileno;
 		this.gender = gender;
 		this.mailid = mailid;
+		this.bookingList = bookingList;
 		this.vehicle = vehicle;
 	}
 
-	
 	public Driver() {
 		super();
 	}
@@ -132,8 +143,6 @@ public class Driver {
 	public String toString() {
 		return "Driver [id=" + id + ", licenseNo=" + licenseNo + ", upiid=" + upiid + ", name=" + name + ", status="
 				+ status + ", age=" + age + ", mobileno=" + mobileno + ", gender=" + gender + ", mailid=" + mailid
-				+ "]";
+				+ ", bookingList=" + bookingList + ", vehicle=" + vehicle + "]";
 	}
-	
-	
 }
