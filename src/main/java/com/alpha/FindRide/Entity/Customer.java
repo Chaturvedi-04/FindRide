@@ -1,4 +1,4 @@
-package com.alpha.FindRide.Entity;
+ package com.alpha.FindRide.Entity;
 
 import java.util.List;
 

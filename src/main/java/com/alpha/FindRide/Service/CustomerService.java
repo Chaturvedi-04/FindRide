@@ -114,6 +114,10 @@ public class CustomerService {
 		String sourceLoc = c.getCurrentloc();
 		String destionationLoc = destinationCity;
 		double distance;
+//		if(sourceLoc == destionationLoc)
+//		{
+//			throw new SameSourcedestinationLocationException();
+//		}
 
 	    try {
 	        RestTemplate restTemplate = new RestTemplate();

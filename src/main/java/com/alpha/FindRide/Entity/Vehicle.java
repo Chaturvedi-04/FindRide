@@ -25,6 +25,7 @@ public class Vehicle {
 	
 	@OneToOne
 	@MapsId
+	@JsonIgnore
 	@JoinColumn(name = "driver_id")
 	@JsonIgnore
 	private Driver driver;
