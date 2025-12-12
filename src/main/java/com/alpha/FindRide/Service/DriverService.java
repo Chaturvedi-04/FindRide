@@ -219,7 +219,7 @@ public class DriverService {
 		return new ResponseEntity<ResponseStructure<ActiveBookingDriverDTO>>(rs,HttpStatus.OK);
 	}
 
-	public ResponseEntity<ResponseStructure<PaymentDTO>> payByCash(int bookingid,String paytype) {
+	public ResponseEntity<ResponseStructure<PaymentDTO>> completePayment(int bookingid,String paytype) {
 		Booking b = br.findById(bookingid).orElseThrow(()->new BookingNotFoundException());
 		b.setBookingStatus("COMPLETED");
 		b.setPaymentStatus("PAID");

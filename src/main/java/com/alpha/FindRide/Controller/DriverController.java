@@ -64,8 +64,8 @@ public class DriverController {
 	 }
 	 
 	 @PostMapping("/completeride/payByCash")
-	 public ResponseEntity<ResponseStructure<PaymentDTO>> payByCash(@RequestParam int bookingid,@RequestParam String paytype)
+	 public ResponseEntity<ResponseStructure<PaymentDTO>> completePayment(@RequestParam int bookingid,@RequestParam String paytype)
 	 {
-		 return ds.payByCash(bookingid, paytype);
+		 return ds.completePayment(bookingid, paytype);
 	 }
 }
