@@ -36,6 +36,15 @@ public class GlobalException {
 		rs.setData("Customer NOT FOUND");
 		return new ResponseEntity<ResponseStructure<String>>(rs,HttpStatus.NOT_FOUND);
     }
+    
+    @ExceptionHandler(BookingNotFoundException.class)
+    public ResponseEntity<ResponseStructure<String>> bookingNotFoundException(BookingNotFoundException ex) {
+    	ResponseStructure<String> rs = new ResponseStructure<String>();
+    	rs.setStatuscode(HttpStatus.NOT_FOUND.value());
+    	rs.setMessage("Booking NOT FOUND");
+    	rs.setData("Booking NOT FOUND");
+    	return new ResponseEntity<ResponseStructure<String>>(rs,HttpStatus.NOT_FOUND);
+    }
 
     @ExceptionHandler(LocationFetchException.class)
     public ResponseEntity<ResponseStructure<String>> locationException(LocationFetchException ex) {

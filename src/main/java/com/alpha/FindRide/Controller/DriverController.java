@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alpha.FindRide.ResponseStructure;
 import com.alpha.FindRide.DTO.ActiveBookingDriverDTO;
 import com.alpha.FindRide.DTO.FindDriverDTO;
+import com.alpha.FindRide.DTO.PaymentDTO;
 import com.alpha.FindRide.DTO.RegisterDriverVehicleDTO;
 import com.alpha.FindRide.DTO.UpdateLocationDTO;
 import com.alpha.FindRide.Entity.Booking;
@@ -51,14 +52,20 @@ public class DriverController {
 	 }
 	
 	 @PostMapping("/seeBookingHistory")
-	 private ResponseEntity<ResponseStructure<List<Booking>>> seeBookingHistory(@RequestParam long mobileno)
+	 public ResponseEntity<ResponseStructure<List<Booking>>> seeBookingHistory(@RequestParam long mobileno)
 	 {
 		return ds.seeBookingHistory(mobileno);
 	 }
 	 
 	 @PostMapping("/seeActiveBooking")
-	 private ResponseEntity<ResponseStructure<ActiveBookingDriverDTO>> seeActiveBooking(@RequestParam long mobileno)
+	 public ResponseEntity<ResponseStructure<ActiveBookingDriverDTO>> seeActiveBooking(@RequestParam long mobileno)
 	 {
 		return ds.seeActiveBooking(mobileno);
+	 }
+	 
+	 @PostMapping("/completeride/payByCash")
+	 public ResponseEntity<ResponseStructure<PaymentDTO>> completePayment(@RequestParam int bookingid,@RequestParam String paytype)
+	 {
+		 return ds.completePayment(bookingid, paytype);
 	 }
 }

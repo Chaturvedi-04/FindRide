@@ -52,13 +52,13 @@ public class CustomerController {
 	}
 	
 	@PostMapping("/seeBookingHistory")
-	private ResponseEntity<ResponseStructure<List<Booking>>> seeBookingHistory(@RequestParam long mobileno)
+	public ResponseEntity<ResponseStructure<List<Booking>>> seeBookingHistory(@RequestParam long mobileno)
 	{
 		return cs.seeBookingHistory(mobileno);
 	}
 	
 	@PostMapping("/seeActiveBooking")
-	private ResponseEntity<ResponseStructure<ActiveBookingDTO>> seeActiveBooking(@RequestParam long mobileno)
+	public ResponseEntity<ResponseStructure<ActiveBookingDTO>> seeActiveBooking(@RequestParam long mobileno)
 	{
 		return cs.seeActiveBooking(mobileno);
 	}

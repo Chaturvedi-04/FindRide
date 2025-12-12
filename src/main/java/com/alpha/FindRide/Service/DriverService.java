@@ -12,16 +12,23 @@ import org.springframework.web.client.RestTemplate;
 import com.alpha.FindRide.ResponseStructure;
 import com.alpha.FindRide.DTO.ActiveBookingDriverDTO;
 import com.alpha.FindRide.DTO.FindDriverDTO;
+import com.alpha.FindRide.DTO.PaymentDTO;
 import com.alpha.FindRide.DTO.RegisterDriverVehicleDTO;
 import com.alpha.FindRide.DTO.UpdateLocationDTO;
 import com.alpha.FindRide.Entity.Booking;
+import com.alpha.FindRide.Entity.Customer;
 import com.alpha.FindRide.Entity.Driver;
+import com.alpha.FindRide.Entity.Payment;
 import com.alpha.FindRide.Entity.Vehicle;
+import com.alpha.FindRide.Exceptions.BookingNotFoundException;
 import com.alpha.FindRide.Exceptions.DriverNotFoundException;
 import com.alpha.FindRide.Exceptions.LocationFetchException;
 import com.alpha.FindRide.Exceptions.NoCurrentBookingException;
 import com.alpha.FindRide.Exceptions.VehicleNotFoundException;
+import com.alpha.FindRide.Repository.BookingRepo;
+import com.alpha.FindRide.Repository.CustomerRepo;
 import com.alpha.FindRide.Repository.DriverRepo;
+import com.alpha.FindRide.Repository.PaymentRepo;
 import com.alpha.FindRide.Repository.VehicleRepo;
 
 import tools.jackson.databind.JsonNode;
@@ -39,6 +46,15 @@ public class DriverService {
 	
 	@Autowired
 	private VehicleRepo vr;
+	
+	@Autowired
+	private BookingRepo br;
+	
+	@Autowired
+	private CustomerRepo cr;
+	
+	@Autowired
+	private PaymentRepo pr;
 
 	public ResponseEntity<ResponseStructure<Driver>> saveDriver(RegisterDriverVehicleDTO rdto) {
 		
@@ -201,6 +217,37 @@ public class DriverService {
 		rs.setMessage("Current Booking is Fetched");
 		rs.setData(abddto);
 		return new ResponseEntity<ResponseStructure<ActiveBookingDriverDTO>>(rs,HttpStatus.OK);
+	}
+
+	public ResponseEntity<ResponseStructure<PaymentDTO>> completePayment(int bookingid,String paytype) {
+		Booking b = br.findById(bookingid).orElseThrow(()->new BookingNotFoundException());
+		b.setBookingStatus("COMPLETED");
+		b.setPaymentStatus("PAID");
+		Customer c = b.getCust();
+		c.setBookingStatus(false);
+		Vehicle v = b.getVehicle();
+		v.setAvailableStatus("Available");
+		Payment p = new Payment();
+		p.setVehicle(v);
+		p.setCustomer(c);
+		p.setBooking(b);
+		p.setAmount(b.getFare());
+		p.setPaymentType(paytype);
+		pr.save(p);
+		b.setPayment(p);
+		cr.save(c);
+		vr.save(v);
+		br.save(b);
+		PaymentDTO pdto = new PaymentDTO();
+		pdto.setBooking(b);
+		pdto.setCustomer(c);
+		pdto.setPayment(p);
+		pdto.setVehicle(v);
+		ResponseStructure<PaymentDTO> rs = new ResponseStructure<PaymentDTO>();
+		rs.setStatuscode(HttpStatus.OK.value());
+		rs.setMessage("Payment Done using cash");
+		rs.setData(pdto);
+		return new ResponseEntity<ResponseStructure<PaymentDTO>>(rs,HttpStatus.OK);
 	}
 	
 }
