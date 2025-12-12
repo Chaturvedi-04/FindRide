@@ -129,10 +129,9 @@ public class DriverService {
 		                "&format=json";
 
 		        RestTemplate restTemplate = new RestTemplate();
-		        String response = restTemplate.getForObject(url, String.class);
-
 		        ObjectMapper mapper = new ObjectMapper();
-		        JsonNode json = mapper.readTree(response);
+		        
+		        JsonNode json = mapper.readTree(restTemplate.getForObject(url, String.class));
 
 		        String city = json.get("address").get("city").asString();
 		        v.setCurrentCity(city);
@@ -146,7 +145,7 @@ public class DriverService {
 
 		    ResponseStructure<Driver> rs = new ResponseStructure<>();
 		    rs.setStatuscode(HttpStatus.OK.value());
-		    rs.setMessage("Driver updated successfully");
+		    rs.setMessage("Driver location updated successfully");
 		    rs.setData(d);
 		    return new ResponseEntity<ResponseStructure<Driver>>(rs,HttpStatus.OK);
 
