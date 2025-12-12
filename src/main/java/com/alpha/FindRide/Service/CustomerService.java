@@ -15,12 +15,14 @@ import com.alpha.FindRide.DTO.ActiveBookingDTO;
 import com.alpha.FindRide.DTO.AvailableVehicleDTO;
 import com.alpha.FindRide.DTO.FindCustomerDTO;
 import com.alpha.FindRide.DTO.RegisterCustomerDTO;
+import com.alpha.FindRide.DTO.UpdateLocationDTO;
 import com.alpha.FindRide.DTO.VehicleDetailDTO;
 import com.alpha.FindRide.Entity.Booking;
 import com.alpha.FindRide.Entity.Customer;
 import com.alpha.FindRide.Entity.Vehicle;
 import com.alpha.FindRide.Exceptions.CustomerNotFoundException;
 import com.alpha.FindRide.Exceptions.InvalidDestinationLocationException;
+import com.alpha.FindRide.Exceptions.LocationFetchException;
 import com.alpha.FindRide.Exceptions.NoCurrentBookingException;
 import com.alpha.FindRide.Exceptions.SameSourceAndDestinationException;
 import com.alpha.FindRide.Repository.CustomerRepo;
@@ -222,5 +224,38 @@ public class CustomerService {
 		rs.setMessage("Current Booking is Fetched");
 		rs.setData(abdto);
 		return new ResponseEntity<ResponseStructure<ActiveBookingDTO>>(rs,HttpStatus.OK);
+	}
+	
+	public ResponseEntity<ResponseStructure<Customer>> updateLocationDriver(UpdateLocationDTO udto) {
+
+	    Customer c = cr.findByMobileno(udto.getMobileno());
+	    if (c == null) {
+	        throw new CustomerNotFoundException();
+	    }
+	    try {
+	        String url = "https://us1.locationiq.com/v1/reverse?key=" + apiKey +
+	                "&lat=" + udto.getLatitude() +
+	                "&lon=" + udto.getLongitude() +
+	                "&format=json";
+
+	        RestTemplate restTemplate = new RestTemplate();
+	        ObjectMapper mapper = new ObjectMapper();
+	        
+	        JsonNode json = mapper.readTree(restTemplate.getForObject(url, String.class));
+
+	        String city = json.get("address").get("city").asString();
+	        c.setCurrentloc(city);
+
+	    } catch (Exception e) {
+	        throw new LocationFetchException("Failed to fetch location from LocationIQ: " + e.getMessage());
+	    }
+
+	    cr.save(c);
+
+	    ResponseStructure<Customer> rs = new ResponseStructure<>();
+	    rs.setStatuscode(HttpStatus.OK.value());
+	    rs.setMessage("Customer location updated successfully");
+	    rs.setData(c);
+	    return new ResponseEntity<ResponseStructure<Customer>>(rs,HttpStatus.OK);
 	}
 }
