@@ -75,7 +75,7 @@ public class BookingService {
 			b.setFare(bookingdto.getFare());
 			b.setEstimatedTime(bookingdto.getEstimatedTime());
 			b.setDistanceTravelled(bookingdto.getDistanceTravelled());
-			b.setBookingDate(LocalDate.now().toString());
+			b.setBookingDate(LocalDate.now());
 			b.setBookingStatus("BOOKED");
 			br.save(b);
 			

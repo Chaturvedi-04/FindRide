@@ -1,5 +1,7 @@
 package com.alpha.FindRide.Service;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import com.alpha.FindRide.DTO.FindDriverDTO;
 import com.alpha.FindRide.DTO.PaymentDTO;
 import com.alpha.FindRide.DTO.RegisterDriverVehicleDTO;
 import com.alpha.FindRide.DTO.UpdateLocationDTO;
+import com.alpha.FindRide.DTO.upiPaymentDTO;
 import com.alpha.FindRide.Entity.Booking;
 import com.alpha.FindRide.Entity.Customer;
 import com.alpha.FindRide.Entity.Driver;
@@ -31,6 +34,7 @@ import com.alpha.FindRide.Repository.DriverRepo;
 import com.alpha.FindRide.Repository.PaymentRepo;
 import com.alpha.FindRide.Repository.VehicleRepo;
 
+import tools.jackson.core.ObjectReadContext.Base;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
@@ -249,5 +253,37 @@ public class DriverService {
 		rs.setData(pdto);
 		return new ResponseEntity<ResponseStructure<PaymentDTO>>(rs,HttpStatus.OK);
 	}
+
+	public ResponseEntity<ResponseStructure<upiPaymentDTO>> paymentService(int bookingid, String paytype) {
+
+	    Booking b = br.findById(bookingid).orElseThrow(() -> new BookingNotFoundException());
+	    String upiid = b.getDriver().getUpiid();
+	    double amount = b.getFare();
+	    String upiData = "upi://pay?pa=" + upiid +"&pn=FindRide" +"&am=" + amount +"&cu=INR";
+
+	    String encodedUpiData = URLEncoder.encode(upiData, StandardCharsets.UTF_8);
+
+	    String qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + encodedUpiData;
+
+	    RestTemplate rt = new RestTemplate();
+	    byte[] qrBytes = rt.getForObject(qrUrl, byte[].class);
+	    upiPaymentDTO updto = new upiPaymentDTO();
+	    updto.setFare(amount);
+	    updto.setQr(qrBytes);
+
+	    ResponseStructure<upiPaymentDTO> rs = new ResponseStructure<>();
+	    rs.setStatuscode(HttpStatus.OK.value());
+	    rs.setMessage("UPI QR generated successfully");
+	    rs.setData(updto);
+
+	    return new ResponseEntity<>(rs, HttpStatus.OK);
+	}
+
+	public ResponseEntity<ResponseStructure<PaymentDTO>> confrimPaymentCollection(int bookingid, String paytype) {
+		
+		return completePayment(bookingid, paytype);
+
+	}
+
 	
 }

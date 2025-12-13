@@ -1,5 +1,7 @@
 package com.alpha.FindRide.Entity;
 
+import java.time.LocalDate;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
@@ -31,7 +33,7 @@ public class Booking {
 	private double distanceTravelled;
 	private double fare;
 	private double estimatedTime;
-	private String bookingDate;
+	private LocalDate bookingDate;
 	private String paymentStatus;
 	@OneToOne
 	@JsonIgnore
@@ -91,10 +93,10 @@ public class Booking {
 	public void setEstimatedTime(double estimatedTime) {
 		this.estimatedTime = estimatedTime;
 	}
-	public String getBookingDate() {
+	public LocalDate getBookingDate() {
 		return bookingDate;
 	}
-	public void setBookingDate(String bookingDate) {
+	public void setBookingDate(LocalDate bookingDate) {
 		this.bookingDate = bookingDate;
 	}
 	public String getPaymentStatus() {
@@ -116,7 +118,7 @@ public class Booking {
 		this.bookingStatus = bookingStatus;
 	}
 	public Booking(int id, Customer cust, Driver driver, Vehicle vehicle, String sourceLoc, String destinationLoc,
-			double distanceTravelled, double fare, double estimatedTime, String bookingDate, String paymentStatus,
+			double distanceTravelled, double fare, double estimatedTime, LocalDate bookingDate, String paymentStatus,
 			Payment payment, String bookingStatus) {
 		super();
 		this.id = id;

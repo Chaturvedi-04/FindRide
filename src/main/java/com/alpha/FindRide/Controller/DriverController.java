@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,7 @@ import com.alpha.FindRide.DTO.FindDriverDTO;
 import com.alpha.FindRide.DTO.PaymentDTO;
 import com.alpha.FindRide.DTO.RegisterDriverVehicleDTO;
 import com.alpha.FindRide.DTO.UpdateLocationDTO;
+import com.alpha.FindRide.DTO.upiPaymentDTO;
 import com.alpha.FindRide.Entity.Booking;
 import com.alpha.FindRide.Entity.Driver;
 import com.alpha.FindRide.Service.DriverService;
@@ -67,5 +69,16 @@ public class DriverController {
 	 public ResponseEntity<ResponseStructure<PaymentDTO>> completePayment(@RequestParam int bookingid,@RequestParam String paytype)
 	 {
 		 return ds.completePayment(bookingid, paytype);
+	 }
+	 
+	 @PostMapping("/completeride/payByUpi")
+	 public ResponseEntity<ResponseStructure<upiPaymentDTO>> paymentService(@RequestParam int bookingid,@RequestParam String paytype)
+	 {
+		 return ds.paymentService(bookingid, paytype);
+	 }
+	 @GetMapping("/ridecompleted/paymentconfirmed")
+	 public ResponseEntity<ResponseStructure<PaymentDTO>> confrimPaymentCollection(@RequestParam int bookingid,@RequestParam String paytype)
+	 {
+		 return ds.confrimPaymentCollection(bookingid,paytype);
 	 }
 }

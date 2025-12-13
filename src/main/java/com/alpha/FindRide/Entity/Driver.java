@@ -145,6 +145,4 @@ public class Driver {
 				+ status + ", age=" + age + ", mobileno=" + mobileno + ", gender=" + gender + ", mailid=" + mailid
 				+ ", vehicle=" + vehicle + ", bookingList=" + bookingList + "]";
 	}
-
-	
 }
