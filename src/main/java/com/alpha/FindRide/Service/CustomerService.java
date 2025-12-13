@@ -13,8 +13,10 @@ import org.springframework.web.client.RestTemplate;
 import com.alpha.FindRide.ResponseStructure;
 import com.alpha.FindRide.DTO.ActiveBookingDTO;
 import com.alpha.FindRide.DTO.AvailableVehicleDTO;
+import com.alpha.FindRide.DTO.BookingHistoryDTO;
 import com.alpha.FindRide.DTO.FindCustomerDTO;
 import com.alpha.FindRide.DTO.RegisterCustomerDTO;
+import com.alpha.FindRide.DTO.RidedetailDTO;
 import com.alpha.FindRide.DTO.UpdateLocationDTO;
 import com.alpha.FindRide.DTO.VehicleDetailDTO;
 import com.alpha.FindRide.Entity.Booking;
@@ -197,15 +199,33 @@ public class CustomerService {
 	    rs.setData(avd);
 	    return new ResponseEntity<ResponseStructure<AvailableVehicleDTO>>(rs,HttpStatus.ACCEPTED);
 	}
-
-	public ResponseEntity<ResponseStructure<List<Booking>>> seeBookingHistory(long mobileno) {
-		List<Booking> blist = vr.findAllCompletedBookingsOfCustomer(mobileno);
-		ResponseStructure<List<Booking>> rs = new ResponseStructure<List<Booking>>();
+	
+	public ResponseEntity<ResponseStructure<BookingHistoryDTO>> seeBookingHistory(long mobileno) {
+		Customer c = cr.findByMobileno(mobileno);
+		List<Booking> blist = c.getBookingList();
+		List<RidedetailDTO> ridedetaildto = new ArrayList<RidedetailDTO>();
+		double totalamount=0;
+		
+		for(Booking b : blist)
+		{
+			RidedetailDTO rdto = new RidedetailDTO();
+			rdto.setFromloc(b.getSourceLoc());
+			rdto.setToloc(b.getDestinationLoc());
+			rdto.setDistance(b.getDistanceTravelled());
+			rdto.setFare(b.getFare());
+			ridedetaildto.add(rdto);
+			totalamount+=b.getFare();
+		}
+		BookingHistoryDTO bhdto = new BookingHistoryDTO();
+		bhdto.setHistory(ridedetaildto);
+		bhdto.setTotalamount(totalamount);
+		ResponseStructure<BookingHistoryDTO> rs = new ResponseStructure<BookingHistoryDTO>();
 		rs.setStatuscode(HttpStatus.OK.value());
-		rs.setMessage("Booking List is Fetched");
-		rs.setData(blist);
-		return new ResponseEntity<ResponseStructure<List<Booking>>>(rs,HttpStatus.OK);
+		rs.setMessage("Booking History is Fetched");
+		rs.setData(bhdto);
+		return new ResponseEntity<ResponseStructure<BookingHistoryDTO>>(rs,HttpStatus.OK);
 	}
+
 
 	public ResponseEntity<ResponseStructure<ActiveBookingDTO>> seeActiveBooking(long mobileno) {
 		Customer c = cr.findByMobileno(mobileno);
