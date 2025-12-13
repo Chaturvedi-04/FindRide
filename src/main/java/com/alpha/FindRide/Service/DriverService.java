@@ -2,6 +2,7 @@ package com.alpha.FindRide.Service;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +14,11 @@ import org.springframework.web.client.RestTemplate;
 
 import com.alpha.FindRide.ResponseStructure;
 import com.alpha.FindRide.DTO.ActiveBookingDriverDTO;
+import com.alpha.FindRide.DTO.BookingHistoryDTO;
 import com.alpha.FindRide.DTO.FindDriverDTO;
 import com.alpha.FindRide.DTO.PaymentDTO;
 import com.alpha.FindRide.DTO.RegisterDriverVehicleDTO;
+import com.alpha.FindRide.DTO.RidedetailDTO;
 import com.alpha.FindRide.DTO.UpdateLocationDTO;
 import com.alpha.FindRide.DTO.upiPaymentDTO;
 import com.alpha.FindRide.Entity.Booking;
@@ -34,7 +37,6 @@ import com.alpha.FindRide.Repository.DriverRepo;
 import com.alpha.FindRide.Repository.PaymentRepo;
 import com.alpha.FindRide.Repository.VehicleRepo;
 
-import tools.jackson.core.ObjectReadContext.Base;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
@@ -187,13 +189,30 @@ public class DriverService {
 	    return new ResponseEntity<ResponseStructure<String>>(rs,HttpStatus.OK);
 	}
 
-	public ResponseEntity<ResponseStructure<List<Booking>>> seeBookingHistory(long mobileno) {
-		List<Booking> blist = vr.findAllCompletedBookingsOfDriver(mobileno);
-		ResponseStructure<List<Booking>> rs = new ResponseStructure<List<Booking>>();
+	public ResponseEntity<ResponseStructure<BookingHistoryDTO>> seeBookingHistory(long mobileno) {
+		Driver d = dr.findByMobileno(mobileno);
+		List<Booking> blist = d.getBookingList();
+		List<RidedetailDTO> ridedetaildto = new ArrayList<RidedetailDTO>();
+		double totalamount=0;
+		
+		for(Booking b : blist)
+		{
+			RidedetailDTO rdto = new RidedetailDTO();
+			rdto.setFromloc(b.getSourceLoc());
+			rdto.setToloc(b.getDestinationLoc());
+			rdto.setDistance(b.getDistanceTravelled());
+			rdto.setFare(b.getFare());
+			ridedetaildto.add(rdto);
+			totalamount+=b.getFare();
+		}
+		BookingHistoryDTO bhdto = new BookingHistoryDTO();
+		bhdto.setHistory(ridedetaildto);
+		bhdto.setTotalamount(totalamount);
+		ResponseStructure<BookingHistoryDTO> rs = new ResponseStructure<BookingHistoryDTO>();
 		rs.setStatuscode(HttpStatus.OK.value());
-		rs.setMessage("Booking List is Fetched");
-		rs.setData(blist);
-		return new ResponseEntity<ResponseStructure<List<Booking>>>(rs,HttpStatus.OK);
+		rs.setMessage("Booking History is Fetched");
+		rs.setData(bhdto);
+		return new ResponseEntity<ResponseStructure<BookingHistoryDTO>>(rs,HttpStatus.OK);
 	}
 	
 	public ResponseEntity<ResponseStructure<ActiveBookingDriverDTO>> seeActiveBooking(long mobileno) {
