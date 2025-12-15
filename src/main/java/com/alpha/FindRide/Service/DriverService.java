@@ -2,6 +2,7 @@ package com.alpha.FindRide.Service;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -304,5 +305,35 @@ public class DriverService {
 
 	}
 
-	
+	public ResponseEntity<ResponseStructure<Booking>> cancelbooking(int driverid, int bookingid) {
+		int cancelcount=0;
+		List<Booking> blist = br.findByDriverIdAndBookingDate(driverid,LocalDate.now());
+		Booking book = br.findById(bookingid).orElseThrow(()->new BookingNotFoundException());
+		for(Booking b:blist)
+		{
+			if(b.getBookingStatus()=="cancelledbydriver")
+			{
+				cancelcount++;
+			}
+		}
+		Driver d = dr.findById(driverid).orElseThrow(()->new DriverNotFoundException());
+		if(cancelcount>=4)
+		{
+			d.setStatus("BLOCKED");
+			book.setBookingStatus("CANCELLED");
+		}
+		else if(cancelcount<4)
+		{
+			book.setBookingStatus("CANCELLED");
+		}
+		dr.save(d);
+		br.save(book);
+		ResponseStructure<Booking> rs = new ResponseStructure<Booking>();
+		rs.setStatuscode(HttpStatus.OK.value());
+		rs.setMessage("Booking cancelled successfully");
+		rs.setData(book);
+		return new ResponseEntity<ResponseStructure<Booking>>(rs,HttpStatus.OK);
+	}
+
+
 }
