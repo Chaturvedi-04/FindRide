@@ -247,8 +247,13 @@ public class DriverService {
 		Booking b = br.findById(bookingid).orElseThrow(()->new BookingNotFoundException());
 		b.setBookingStatus("COMPLETED");
 		b.setPaymentStatus("PAID");
+		
 		Customer c = b.getCust();
 		c.setBookingStatus(false);
+		
+		if(c.getPenaltyCount() > 0) {
+		    c.setPenaltyCount(0);
+		}
 		Vehicle v = b.getVehicle();
 		v.setAvailableStatus("Available");
 		Payment p = new Payment();

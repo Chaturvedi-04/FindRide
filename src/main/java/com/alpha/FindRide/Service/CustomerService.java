@@ -174,23 +174,36 @@ public class CustomerService {
 	        
 	        double distanceInMeters = dirJson.get("routes").get(0).get("distance").asDouble();
 	        distance = distanceInMeters / 1000; // Convert meters → kilometers
+	        
 	    }
 	    catch (Exception e) {
 	        throw new RuntimeException("Error fetching distance: " + e.getMessage());
 	    }
+	    double penaltyamount = 0;
+	    double penaltyrate = 0;
+	    
+        if (c.getPenaltyCount() > 1) {
+            penaltyrate = (c.getPenaltyCount() - 1) * 0.10; 
+        }
+
 	    AvailableVehicleDTO avd = new AvailableVehicleDTO();
 	    avd.setAvailableVehicles(new ArrayList<>());
+//	    avd.setPenaltyamount(penaltyamount * 100); 
 	    
 	    List<Vehicle> availableVehicles = vr.findByCurrentCity(sourceLoc);
 	    
 	    for(Vehicle v: availableVehicles)
 	    {
-	    	double fare = v.getPricePerKM()*distance;
+	    	double fare = v.getPricePerKM() * distance;
+	    	 double totalFare = fare + (fare * penaltyrate);
+	    	
+	    	penaltyamount = fare * penaltyrate;
+
 	    	double estimatedTime = distance/v.getAverageSpeed();
-	    	VehicleDetailDTO vd = new VehicleDetailDTO(v,fare,estimatedTime);
+	    	VehicleDetailDTO vd = new VehicleDetailDTO(v,totalFare,estimatedTime);
 	    	avd.getAvailableVehicles().add(vd);
 	    }
-	    
+	    avd.setPenaltyamount(penaltyamount);
 	    avd.setC(c);
 	    avd.setDistance(distance);
 	    avd.setSourceloc(sourceLoc);

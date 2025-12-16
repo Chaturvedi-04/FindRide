@@ -10,7 +10,25 @@ public class AvailableVehicleDTO {
 	private double distance;
 	private String sourceloc;
 	private String destinationloc;
+	private double penaltyamount;
 	private List<VehicleDetailDTO> availableVehicles;
+	
+	public AvailableVehicleDTO(Customer c, double distance, String sourceloc, String destinationloc,
+			double penaltyamount, List<VehicleDetailDTO> availableVehicles) {
+		super();
+		this.c = c;
+		this.distance = distance;
+		this.sourceloc = sourceloc;
+		this.destinationloc = destinationloc;
+		this.penaltyamount = penaltyamount;
+		this.availableVehicles = availableVehicles;
+	}
+	public double getPenaltyamount() {
+		return penaltyamount;
+	}
+	public void setPenaltyamount(double penaltyamount) {
+		this.penaltyamount = penaltyamount;
+	}
 	public Customer getC() {
 		return c;
 	}
@@ -41,21 +59,14 @@ public class AvailableVehicleDTO {
 	public void setAvailableVehicles(List<VehicleDetailDTO> availableVehicles) {
 		this.availableVehicles = availableVehicles;
 	}
-	public AvailableVehicleDTO(Customer c, double distance, String sourceloc, String destinationloc,
-			List<VehicleDetailDTO> availableVehicles) {
-		super();
-		this.c = c;
-		this.distance = distance;
-		this.sourceloc = sourceloc;
-		this.destinationloc = destinationloc;
-		this.availableVehicles = availableVehicles;
-	}
 	public AvailableVehicleDTO() {
 		super();
 	}
 	@Override
 	public String toString() {
 		return "AvailableVehicleDTO [c=" + c + ", distance=" + distance + ", sourceloc=" + sourceloc
-				+ ", destinationloc=" + destinationloc + ", availableVehicles=" + availableVehicles + "]";
+				+ ", destinationloc=" + destinationloc + ", penaltyamount=" + penaltyamount + ", availableVehicles="
+				+ availableVehicles + "]";
 	}
+	
 }
