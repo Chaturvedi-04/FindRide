@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,7 @@ import com.alpha.FindRide.DTO.AvailableVehicleDTO;
 import com.alpha.FindRide.DTO.BookingHistoryDTO;
 import com.alpha.FindRide.DTO.FindCustomerDTO;
 import com.alpha.FindRide.DTO.RegisterCustomerDTO;
+import com.alpha.FindRide.Entity.Booking;
 import com.alpha.FindRide.Entity.Customer;
 import com.alpha.FindRide.Service.CustomerService;
 
@@ -60,4 +62,10 @@ public class CustomerController {
 	{
 		return cs.seeActiveBooking(mobileno);
 	}
+	
+	 @PostMapping("/cancelbooking")
+	 public ResponseEntity<ResponseStructure<Booking>> cancelBooking (@RequestParam int customerid,@RequestParam int bookingid)
+	 {
+		 return cs.cancelbooking(customerid, bookingid);
+	 }
 }

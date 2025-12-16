@@ -39,7 +39,7 @@ public class BookingService {
 	{
 		Customer c = cr.findByMobileno(mobileno);
 		Booking b1 = new Booking();
-		if(c.getBookingStatus()==true)
+		if(c.isBookingStatus()==true)
 		{
 			List<Booking> blist = c.getBookingList();
 			for(Booking b: blist)
@@ -77,6 +77,15 @@ public class BookingService {
 			b.setDistanceTravelled(bookingdto.getDistanceTravelled());
 			b.setBookingDate(LocalDate.now());
 			b.setBookingStatus("BOOKED");
+			
+			//penalty added if the booking is cancelled
+		    double baseFare = v.getPricePerKM() * bookingdto.getDistanceTravelled();
+		    double totalFare = baseFare;
+		    int penaltyCount = c.getPenaltyCount();
+		    if (penaltyCount > 1) {
+		        totalFare = baseFare + (baseFare / 100) * penaltyCount * 10;
+		    }
+		    b.setFare(totalFare);
 			br.save(b);
 			
 			c.getBookingList().add(b);

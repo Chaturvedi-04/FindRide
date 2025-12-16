@@ -24,9 +24,27 @@ public class Customer {
 	private String emailid;
 	private String currentloc;
 	private boolean bookingStatus=false;
+	private int penaltyCount = 0;
+	
 	@OneToMany(mappedBy = "cust", cascade = CascadeType.ALL)
 	@JsonIgnore
 	private List<Booking> bookingList;
+	public Customer(String name, int age, String gender, long mobileno, String emailid, String currentloc,
+			boolean bookingStatus, int penaltyCount, List<Booking> bookingList) {
+		super();
+		this.name = name;
+		this.age = age;
+		this.gender = gender;
+		this.mobileno = mobileno;
+		this.emailid = emailid;
+		this.currentloc = currentloc;
+		this.bookingStatus = bookingStatus;
+		this.penaltyCount = penaltyCount;
+		this.bookingList = bookingList;
+	}
+	public Customer() {
+		super();
+	}
 	public int getId() {
 		return id;
 	}
@@ -69,11 +87,17 @@ public class Customer {
 	public void setCurrentloc(String currentloc) {
 		this.currentloc = currentloc;
 	}
-	public boolean getBookingStatus() {
+	public boolean isBookingStatus() {
 		return bookingStatus;
 	}
 	public void setBookingStatus(boolean bookingStatus) {
 		this.bookingStatus = bookingStatus;
+	}
+	public int getPenaltyCount() {
+		return penaltyCount;
+	}
+	public void setPenaltyCount(int penaltyCount) {
+		this.penaltyCount = penaltyCount;
 	}
 	public List<Booking> getBookingList() {
 		return bookingList;
@@ -81,26 +105,11 @@ public class Customer {
 	public void setBookingList(List<Booking> bookingList) {
 		this.bookingList = bookingList;
 	}
-	public Customer(int id, String name, int age, String gender, long mobileno, String emailid, String currentloc,
-			boolean bookingStatus, List<Booking> bookingList) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.age = age;
-		this.gender = gender;
-		this.mobileno = mobileno;
-		this.emailid = emailid;
-		this.currentloc = currentloc;
-		this.bookingStatus = bookingStatus;
-		this.bookingList = bookingList;
-	}
-	public Customer() {
-		super();
-	}
 	@Override
 	public String toString() {
 		return "Customer [id=" + id + ", name=" + name + ", age=" + age + ", gender=" + gender + ", mobileno="
 				+ mobileno + ", emailid=" + emailid + ", currentloc=" + currentloc + ", bookingStatus=" + bookingStatus
-				+ ", bookingList=" + bookingList + "]";
-	}
+				+ ", penaltyCount=" + penaltyCount + ", bookingList=" + bookingList + "]";
+	}	
+	
 }

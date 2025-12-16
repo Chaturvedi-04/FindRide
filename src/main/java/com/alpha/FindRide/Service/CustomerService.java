@@ -1,5 +1,6 @@
 package com.alpha.FindRide.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,12 +22,17 @@ import com.alpha.FindRide.DTO.UpdateLocationDTO;
 import com.alpha.FindRide.DTO.VehicleDetailDTO;
 import com.alpha.FindRide.Entity.Booking;
 import com.alpha.FindRide.Entity.Customer;
+import com.alpha.FindRide.Entity.Driver;
 import com.alpha.FindRide.Entity.Vehicle;
+import com.alpha.FindRide.Exceptions.BookingNotFoundException;
 import com.alpha.FindRide.Exceptions.CustomerNotFoundException;
+import com.alpha.FindRide.Exceptions.DriverNotFoundException;
 import com.alpha.FindRide.Exceptions.InvalidDestinationLocationException;
 import com.alpha.FindRide.Exceptions.LocationFetchException;
 import com.alpha.FindRide.Exceptions.NoCurrentBookingException;
 import com.alpha.FindRide.Exceptions.SameSourceAndDestinationException;
+import com.alpha.FindRide.Exceptions.VehicleNotFoundException;
+import com.alpha.FindRide.Repository.BookingRepo;
 import com.alpha.FindRide.Repository.CustomerRepo;
 import com.alpha.FindRide.Repository.VehicleRepo;
 
@@ -44,6 +50,9 @@ public class CustomerService {
 	
 	@Autowired
 	private VehicleRepo vr;
+	
+	@Autowired
+	private BookingRepo br;
 
 	public ResponseEntity<ResponseStructure<Customer>> saveCustomer(RegisterCustomerDTO rdto) {
 		Customer c = new Customer();
@@ -118,11 +127,6 @@ public class CustomerService {
 		String sourceLoc = c.getCurrentloc();
 		String destionationLoc = destinationCity;
 		double distance;
-//		if(sourceLoc == destionationLoc)
-//		{
-//			throw new SameSourcedestinationLocationException();
-//		}
-
 	    try {
 	        RestTemplate restTemplate = new RestTemplate();
 	        ObjectMapper mapper = new ObjectMapper();
@@ -281,5 +285,48 @@ public class CustomerService {
 	    rs.setMessage("Customer location updated successfully");
 	    rs.setData(c);
 	    return new ResponseEntity<ResponseStructure<Customer>>(rs,HttpStatus.OK);
+	}
+	
+	public ResponseEntity<ResponseStructure<Booking>> cancelbooking(int customerid, int bookingid) {
+		
+		Customer c = cr.findById(customerid).orElseThrow(CustomerNotFoundException::new);
+
+		Booking book = br.findById(bookingid).orElseThrow(BookingNotFoundException::new);
+
+//		Vehicle v= vr.findById(v.getId()).orElseThrow(()->new VehicleNotFoundException());
+				
+		if (book.getCust().getId() != customerid) {
+			throw new BookingNotFoundException(); 
+		}
+		if (book.getBookingStatus().equalsIgnoreCase("CANCELLED")) {
+		        throw new IllegalStateException("Booking already cancelled");
+		}
+
+		book.setBookingStatus("CANCELLED By CUSTOMER");
+		book.setPaymentStatus("NOT PAID");
+		
+		if (c.getPenaltyCount() >= 1) {      
+		        c.setPenaltyCount(c.getPenaltyCount() + 1);
+		 } else {       
+		        c.setPenaltyCount(1);
+		 }
+	    c.setBookingStatus(false);
+	    
+		br.save(book);
+		cr.save(c);
+
+		Vehicle v = book.getVehicle();
+//		Driver d = book.getDriver();
+
+		v.setAvailableStatus("AVAILABLE");
+//		d.setStatus("AVAILABLE");
+
+		vr.save(v);
+		 
+		ResponseStructure<Booking> rs = new ResponseStructure<Booking>();
+		rs.setStatuscode(HttpStatus.OK.value());
+		rs.setMessage("Booking cancelled successfully");
+		rs.setData(book);
+		return new ResponseEntity<ResponseStructure<Booking>>(rs,HttpStatus.OK);
 	}
 }
