@@ -15,6 +15,9 @@ import com.alpha.FindRide.Entity.Booking;
 import com.alpha.FindRide.Entity.Customer;
 import com.alpha.FindRide.Entity.Driver;
 import com.alpha.FindRide.Entity.Vehicle;
+import com.alpha.FindRide.Exceptions.CustomerNotFoundException;
+import com.alpha.FindRide.Exceptions.DriverNotFoundException;
+import com.alpha.FindRide.Exceptions.VehicleNotFoundException;
 import com.alpha.FindRide.Repository.BookingRepo;
 import com.alpha.FindRide.Repository.CustomerRepo;
 import com.alpha.FindRide.Repository.DriverRepo;
@@ -35,9 +38,12 @@ public class BookingService {
 	@Autowired
 	private DriverRepo dr;
 	
+	@Autowired
+	private MailService ms;
+	
 	public ResponseEntity<ResponseStructure<ActiveBookingDTO>> bookVehicle(long mobileno,BookingDTO bookingdto)
 	{
-		Customer c = cr.findByMobileno(mobileno);
+		Customer c = cr.findByMobileno(mobileno).orElseThrow(()->new CustomerNotFoundException());
 		Booking b1 = new Booking();
 		if(c.isBookingStatus()==true)
 		{
@@ -63,8 +69,8 @@ public class BookingService {
 		}
 		else
 		{
-			Vehicle v = vr.findById(bookingdto.getVehicleid()).get();
-			Driver d = dr.findById(v.getId()).get();
+			Vehicle v = vr.findById(bookingdto.getVehicleid()).orElseThrow(()->new VehicleNotFoundException());
+			Driver d = dr.findById(v.getId()).orElseThrow(()->new DriverNotFoundException());
 			Booking b = new Booking();
 			b.setCust(c);
 			b.setVehicle(v);
@@ -77,7 +83,7 @@ public class BookingService {
 			b.setDistanceTravelled(bookingdto.getDistanceTravelled());
 			b.setBookingDate(LocalDate.now());
 			b.setBookingStatus("BOOKED");
-			
+
 			//penalty added if the booking is cancelled
 		    double baseFare = v.getPricePerKM() * bookingdto.getDistanceTravelled();
 		    double totalFare = baseFare;
@@ -106,6 +112,55 @@ public class BookingService {
 			rs.setStatuscode(HttpStatus.OK.value());
 			rs.setMessage("You have successfully booked the vehicle");
 			rs.setData(abdto);
+			ms.sendMail(c.getEmailid(),"Booking Confirmation","Dear" +c.getName()+"\r\n"
+					+ "\r\n"
+					+ "Your booking has been successfully confirmed! 🎉\r\n"
+					+ "\r\n"
+					+ "📌 Booking Details:\r\n"
+					+ "-----------------------------------\r\n"
+					+ "Booking ID     : "+b.getId()+"\r\n"
+					+ "Date           : "+b.getBookingDate()+"\r\n"
+					+ "Pickup Location: "+c.getCurrentloc()+"\r\n"
+					+ "Drop Location  : "+b.getDestinationLoc()+"\r\n"
+					+ "Amount To Be Paid    : "+b.getFare()+"\r\n"
+					+ "-----------------------------------\r\n"
+					+ "\r\n"
+					+ "Our driver "+d.getName()+" will contact you shortly before pickup.\r\n"
+					+ "\r\n"
+					+ "If you have any questions or need assistance, feel free to contact us.\r\n"
+					+ "\r\n"
+					+ "Thank you for choosing findRide.\r\n"
+					+ "We wish you a safe and pleasant journey!\r\n"
+					+ "\r\n"
+					+ "Best Regards,  \r\n"
+					+ "findRide Support Team  \r\n"
+					+ "📞 9908223304  \r\n"
+					+ "📧 support@gmail.com\r\n"
+					+ "");
+			ms.sendMail(d.getMailid(),"Booking Confirmation","\"Booking Assigned\",\"Dear" + d.getName() + "\r\n"
+					+ "        + \"You have been assigned a new booking! 🚗\\r\\n\"\r\n"
+					+ "        + \"\\r\\n\"\r\n"
+					+ "        + \"📌 Booking Details:\\r\\n\"\r\n"
+					+ "        + \"-----------------------------------\\r\\n\"\r\n"
+					+ "        + \"Booking ID     : " + b.getId() + "\\r\\n\"\r\n"
+					+ "        + \"Date           : " + b.getBookingDate() + "\\r\\n\"\r\n"
+					+ "        + \"Customer Name  : " + c.getName() + "\\r\\n\"\r\n"
+					+ "        + \"Pickup Location: " + c.getCurrentloc() + "\\r\\n\"\r\n"
+					+ "        + \"Drop Location  : " + b.getDestinationLoc() + "\\r\\n\"\r\n"
+					+ "        + \"Fare Amount    : " + b.getFare() + "\\r\\n\"\r\n"
+					+ "        + \"-----------------------------------\\r\\n\"\r\n"
+					+ "        + \"\\r\\n\"\r\n"
+					+ "        + \"Please ensure timely arrival at the pickup location.\\r\\n\"\r\n"
+					+ "        + \"Contact the customer before starting the trip if required.\\r\\n\"\r\n"
+					+ "        + \"\\r\\n\"\r\n"
+					+ "        + \"We wish you a safe and successful ride.\\r\\n\"\r\n"
+					+ "        + \"\\r\\n\"\r\n"
+					+ "        + \"Best Regards,  \\r\\n\"\r\n"
+					+ "        + \"findRide Driver Support Team  \\r\\n\"\r\n"
+					+ "        + \"📞 9908223304  \\r\\n\"\r\n"
+					+ "        + \"📧 support@gmail.com\\r\\n\"\r\n"
+					+ "        + \"\"\r\n"
+					+ "");
 			return new ResponseEntity<ResponseStructure<ActiveBookingDTO>>(rs,HttpStatus.OK);
 		}
 	}

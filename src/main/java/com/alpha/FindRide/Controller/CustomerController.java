@@ -68,4 +68,10 @@ public class CustomerController {
 	 {
 		 return cs.cancelbooking(customerid, bookingid);
 	 }
+	 
+	 @GetMapping("/getotp")
+	 public ResponseEntity<ResponseStructure<Integer>> getotp(@RequestParam int bookingid)
+	 {
+		 return cs.getotp(bookingid);
+	 }
 }

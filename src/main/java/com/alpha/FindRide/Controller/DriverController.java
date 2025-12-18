@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -68,9 +67,9 @@ public class DriverController {
 	 }
 	 
 	 @PostMapping("/completeride/payByCash")
-	 public ResponseEntity<ResponseStructure<PaymentDTO>> completePayment(@RequestParam int bookingid,@RequestParam String paytype)
+	 public ResponseEntity<ResponseStructure<PaymentDTO>> completePayment(@RequestParam int bookingid,@RequestParam String paytype,@RequestParam int otp)
 	 {
-		 return ds.completePayment(bookingid, paytype);
+		 return ds.completePayment(bookingid, paytype,otp);
 	 }
 	 
 	 @PostMapping("/completeride/payByUpi")
@@ -80,14 +79,20 @@ public class DriverController {
 	 }
 	 
 	 @GetMapping("/ridecompleted/paymentconfirmed")
-	 public ResponseEntity<ResponseStructure<PaymentDTO>> confrimPaymentCollection(@RequestParam int bookingid,@RequestParam String paytype)
+	 public ResponseEntity<ResponseStructure<PaymentDTO>> confrimPaymentCollection(@RequestParam int bookingid,@RequestParam String paytype,@RequestParam int otp)
 	 {
-		 return ds.confrimPaymentCollection(bookingid,paytype);
+		 return ds.confrimPaymentCollection(bookingid,paytype,otp);
 	 }
 	 
 	 @PostMapping("/cancelbooking")
 	 public ResponseEntity<ResponseStructure<Booking>> cancelbooking(@RequestParam int driverid,@RequestParam int bookingid)
 	 {
 		 return ds.cancelbooking(driverid,bookingid);
+	 }
+	 
+	 @PostMapping("/startride")
+	 public ResponseEntity<ResponseStructure<String>> startride(@RequestParam int otp,@RequestParam int bookingid)
+	 {
+		 return ds.startride(otp,bookingid);
 	 }
 }

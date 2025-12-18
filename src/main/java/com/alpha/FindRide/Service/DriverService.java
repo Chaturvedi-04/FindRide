@@ -29,6 +29,7 @@ import com.alpha.FindRide.Entity.Payment;
 import com.alpha.FindRide.Entity.Vehicle;
 import com.alpha.FindRide.Exceptions.BookingNotFoundException;
 import com.alpha.FindRide.Exceptions.DriverNotFoundException;
+import com.alpha.FindRide.Exceptions.InvalidOtpException;
 import com.alpha.FindRide.Exceptions.LocationFetchException;
 import com.alpha.FindRide.Exceptions.NoCurrentBookingException;
 import com.alpha.FindRide.Exceptions.VehicleNotFoundException;
@@ -121,10 +122,7 @@ public class DriverService {
 	}
 	
 	public ResponseEntity<ResponseStructure<Driver>> findDriver(FindDriverDTO fdto) {
-	    Driver d = dr.findByMobileno(fdto.getMobileno());
-	    if (d == null) {
-	        throw new DriverNotFoundException();
-	    }
+	    Driver d = dr.findByMobileno(fdto.getMobileno()).orElseThrow(()->new DriverNotFoundException());
         ResponseStructure<Driver> rs = new ResponseStructure<>();
         rs.setStatuscode(HttpStatus.FOUND.value());
         rs.setMessage("Driver with MobileNo " + fdto.getMobileno() + " found");
@@ -135,16 +133,11 @@ public class DriverService {
 
 	public ResponseEntity<ResponseStructure<Driver>> updateLocation(UpdateLocationDTO udto) {
 
-		    Driver d = dr.findByMobileno(udto.getMobileno());
-		    if (d == null) {
-		        throw new DriverNotFoundException();
-		    }
-
+		    Driver d = dr.findByMobileno(udto.getMobileno()).orElseThrow(()->new DriverNotFoundException());
 		    Vehicle v = d.getVehicle();
 		    if (v == null) {
 		        throw new RuntimeException("Vehicle not assigned for this driver");
 		    }
-
 		    try {
 		        String url = "https://us1.locationiq.com/v1/reverse?key=" + apiKey +
 		                "&lat=" + udto.getLatitude() +
@@ -175,13 +168,8 @@ public class DriverService {
 	}
 
 	public ResponseEntity<ResponseStructure<String>> deleteDriver(long mobileno) {
-		Driver d = dr.findByMobileno(mobileno);
-		if(d!=null) {
-			dr.delete(d);
-		}
-		else {
-		System.out.println("Driver Not Deleted");
-		}
+		Driver d = dr.findByMobileno(mobileno).orElseThrow(()->new DriverNotFoundException());
+		dr.delete(d);
 		ResponseStructure<String> rs = new ResponseStructure<>();
 	    rs.setStatuscode(HttpStatus.OK.value());
 	    rs.setMessage("Driver deleted");
@@ -191,7 +179,7 @@ public class DriverService {
 	}
 
 	public ResponseEntity<ResponseStructure<BookingHistoryDTO>> seeBookingHistory(long mobileno) {
-		Driver d = dr.findByMobileno(mobileno);
+		Driver d = dr.findByMobileno(mobileno).orElseThrow(()->new DriverNotFoundException());
 		List<Booking> blist = d.getBookingList();
 		List<RidedetailDTO> ridedetaildto = new ArrayList<RidedetailDTO>();
 		double totalamount=0;
@@ -217,19 +205,9 @@ public class DriverService {
 	}
 	
 	public ResponseEntity<ResponseStructure<ActiveBookingDriverDTO>> seeActiveBooking(long mobileno) {
-		Driver d = dr.findByMobileno(mobileno);
-	    if (d == null) {
-	        throw new DriverNotFoundException();
-	    }
-	    Vehicle v = vr.findById(d.getId()).get();
-	    if (v == null) {
-	    	throw new VehicleNotFoundException();
-	    }
-	    Booking b = vr.findActiveBookingOfDriver(mobileno);
-	    if(b==null)
-	    {
-	    	throw new NoCurrentBookingException();
-	    }
+		Driver d = dr.findByMobileno(mobileno).orElseThrow(()->new DriverNotFoundException());
+	    Vehicle v = vr.findById(d.getId()).orElseThrow(()->new VehicleNotFoundException());
+	    Booking b = vr.findActiveBookingOfDriver(mobileno).orElseThrow(()->new NoCurrentBookingException());
 	    ActiveBookingDriverDTO abddto = new ActiveBookingDriverDTO();
 	    abddto.setBooking(b);
 	    abddto.setDrivername(d.getName());
@@ -243,8 +221,9 @@ public class DriverService {
 		return new ResponseEntity<ResponseStructure<ActiveBookingDriverDTO>>(rs,HttpStatus.OK);
 	}
 
-	public ResponseEntity<ResponseStructure<PaymentDTO>> completePayment(int bookingid,String paytype) {
+	public ResponseEntity<ResponseStructure<PaymentDTO>> completePayment(int bookingid,String paytype, int otp) {
 		Booking b = br.findById(bookingid).orElseThrow(()->new BookingNotFoundException());
+		if(b.getOtp()!=otp) throw new InvalidOtpException();
 		b.setBookingStatus("COMPLETED");
 		b.setPaymentStatus("PAID");
 		
@@ -301,12 +280,12 @@ public class DriverService {
 	    rs.setMessage("UPI QR generated successfully");
 	    rs.setData(updto);
 
-	    return new ResponseEntity<>(rs, HttpStatus.OK);
+	    return new ResponseEntity<ResponseStructure<upiPaymentDTO>>(rs, HttpStatus.OK);
 	}
 
-	public ResponseEntity<ResponseStructure<PaymentDTO>> confrimPaymentCollection(int bookingid, String paytype) {
+	public ResponseEntity<ResponseStructure<PaymentDTO>> confrimPaymentCollection(int bookingid, String paytype,int otp) {
 		
-		return completePayment(bookingid, paytype);
+		return completePayment(bookingid, paytype,otp);
 
 	}
 
@@ -316,7 +295,7 @@ public class DriverService {
 		Booking book = br.findById(bookingid).orElseThrow(()->new BookingNotFoundException());
 		for(Booking b:blist)
 		{
-			if(b.getBookingStatus()=="cancelledbydriver")
+			if(b.getBookingStatus()=="CANCELLED By DRIVER")
 			{
 				cancelcount++;
 			}
@@ -340,5 +319,15 @@ public class DriverService {
 		return new ResponseEntity<ResponseStructure<Booking>>(rs,HttpStatus.OK);
 	}
 
+	public ResponseEntity<ResponseStructure<String>> startride(int otp,int bookingid) 
+	{	
+		Booking b = br.findById(bookingid).orElseThrow(()->new BookingNotFoundException());
+		if(otp==b.getOtp()) throw new InvalidOtpException();
+		ResponseStructure<String> rs = new ResponseStructure<String>();
+		rs.setStatuscode(HttpStatus.OK.value());
+		rs.setMessage("OTP verified successfully");
+		rs.setData("OTP verified successfully");
+		return new ResponseEntity<ResponseStructure<String>>(rs,HttpStatus.OK);
+	}
 
 }

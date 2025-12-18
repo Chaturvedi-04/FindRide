@@ -42,6 +42,7 @@ public class Booking {
 	@JsonIgnore
 	private Payment payment;
 	private String bookingStatus="AVAILABLE";
+	private int otp;
 	public int getId() {
 		return id;
 	}
@@ -120,9 +121,15 @@ public class Booking {
 	public void setBookingStatus(String bookingStatus) {
 		this.bookingStatus = bookingStatus;
 	}
+	public int getOtp() {
+		return otp;
+	}
+	public void setOtp(int otp) {
+		this.otp = otp;
+	}
 	public Booking(int id, Customer cust, Driver driver, Vehicle vehicle, String sourceLoc, String destinationLoc,
 			double distanceTravelled, double fare, double estimatedTime, LocalDate bookingDate, String paymentStatus,
-			Payment payment, String bookingStatus) {
+			Payment payment, String bookingStatus, int otp) {
 		super();
 		this.id = id;
 		this.cust = cust;
@@ -137,6 +144,7 @@ public class Booking {
 		this.paymentStatus = paymentStatus;
 		this.payment = payment;
 		this.bookingStatus = bookingStatus;
+		this.otp = otp;
 	}
 	public Booking() {
 		super();
@@ -147,6 +155,6 @@ public class Booking {
 				+ sourceLoc + ", destinationLoc=" + destinationLoc + ", distanceTravelled=" + distanceTravelled
 				+ ", fare=" + fare + ", estimatedTime=" + estimatedTime + ", bookingDate=" + bookingDate
 				+ ", paymentStatus=" + paymentStatus + ", payment=" + payment + ", bookingStatus=" + bookingStatus
-				+ "]";
+				+ ", otp=" + otp + "]";
 	}
 }
