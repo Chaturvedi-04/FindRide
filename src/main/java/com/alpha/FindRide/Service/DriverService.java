@@ -16,7 +16,6 @@ import org.springframework.web.client.RestTemplate;
 import com.alpha.FindRide.ResponseStructure;
 import com.alpha.FindRide.DTO.ActiveBookingDriverDTO;
 import com.alpha.FindRide.DTO.BookingHistoryDTO;
-import com.alpha.FindRide.DTO.FindDriverDTO;
 import com.alpha.FindRide.DTO.PaymentDTO;
 import com.alpha.FindRide.DTO.RegisterDriverVehicleDTO;
 import com.alpha.FindRide.DTO.RidedetailDTO;
@@ -121,11 +120,11 @@ public class DriverService {
 		return new ResponseEntity<ResponseStructure<Driver>>(rs,HttpStatus.CREATED);
 	}
 	
-	public ResponseEntity<ResponseStructure<Driver>> findDriver(FindDriverDTO fdto) {
-	    Driver d = dr.findByMobileno(fdto.getMobileno()).orElseThrow(()->new DriverNotFoundException());
+	public ResponseEntity<ResponseStructure<Driver>> findDriver(long mobileno) {
+	    Driver d = dr.findByMobileno(mobileno).orElseThrow(()->new DriverNotFoundException());
         ResponseStructure<Driver> rs = new ResponseStructure<>();
         rs.setStatuscode(HttpStatus.FOUND.value());
-        rs.setMessage("Driver with MobileNo " + fdto.getMobileno() + " found");
+        rs.setMessage("Driver with MobileNo " + mobileno + " found");
         rs.setData(d);
 
         return new ResponseEntity<ResponseStructure<Driver>>(rs,HttpStatus.FOUND);
@@ -229,12 +228,14 @@ public class DriverService {
 		
 		Customer c = b.getCust();
 		c.setBookingStatus(false);
+		c.setCurrentloc(b.getDestinationLoc());
 		
 		if(c.getPenaltyCount() > 0) {
 		    c.setPenaltyCount(0);
 		}
 		Vehicle v = b.getVehicle();
 		v.setAvailableStatus("Available");
+		v.setCurrentCity(b.getDestinationLoc());
 		Payment p = new Payment();
 		p.setVehicle(v);
 		p.setCustomer(c);
@@ -253,7 +254,7 @@ public class DriverService {
 		pdto.setVehicle(v);
 		ResponseStructure<PaymentDTO> rs = new ResponseStructure<PaymentDTO>();
 		rs.setStatuscode(HttpStatus.OK.value());
-		rs.setMessage("Payment Done using cash");
+		rs.setMessage("Payment Done using "+paytype);
 		rs.setData(pdto);
 		return new ResponseEntity<ResponseStructure<PaymentDTO>>(rs,HttpStatus.OK);
 	}
@@ -322,7 +323,7 @@ public class DriverService {
 	public ResponseEntity<ResponseStructure<String>> startride(int otp,int bookingid) 
 	{	
 		Booking b = br.findById(bookingid).orElseThrow(()->new BookingNotFoundException());
-		if(otp==b.getOtp()) throw new InvalidOtpException();
+		if(otp!=b.getOtp()) throw new InvalidOtpException();
 		ResponseStructure<String> rs = new ResponseStructure<String>();
 		rs.setStatuscode(HttpStatus.OK.value());
 		rs.setMessage("OTP verified successfully");

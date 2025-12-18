@@ -14,7 +14,6 @@ import com.alpha.FindRide.ResponseStructure;
 import com.alpha.FindRide.DTO.ActiveBookingDTO;
 import com.alpha.FindRide.DTO.AvailableVehicleDTO;
 import com.alpha.FindRide.DTO.BookingHistoryDTO;
-import com.alpha.FindRide.DTO.FindCustomerDTO;
 import com.alpha.FindRide.DTO.RegisterCustomerDTO;
 import com.alpha.FindRide.DTO.RidedetailDTO;
 import com.alpha.FindRide.DTO.UpdateLocationDTO;
@@ -87,11 +86,11 @@ public class CustomerService {
 		return new ResponseEntity<ResponseStructure<Customer>>(rs,HttpStatus.CREATED);
 	}
 
-	public ResponseEntity<ResponseStructure<Customer>> findCustomer(FindCustomerDTO cdto) {
-		Customer c = cr.findByMobileno(cdto.getMobileno()).orElseThrow(()->new CustomerNotFoundException());
+	public ResponseEntity<ResponseStructure<Customer>> findCustomer(long mobileno) {
+		Customer c = cr.findByMobileno(mobileno).orElseThrow(()->new CustomerNotFoundException());
         ResponseStructure<Customer> rs = new ResponseStructure<>();
         rs.setStatuscode(HttpStatus.FOUND.value());
-        rs.setMessage("Customer with MobileNo " + cdto.getMobileno() + " found");
+        rs.setMessage("Customer with MobileNo " + mobileno + " found");
         rs.setData(c);
 
         return new ResponseEntity<ResponseStructure<Customer>>(rs,HttpStatus.FOUND);

@@ -15,7 +15,6 @@ import com.alpha.FindRide.ResponseStructure;
 import com.alpha.FindRide.DTO.ActiveBookingDTO;
 import com.alpha.FindRide.DTO.AvailableVehicleDTO;
 import com.alpha.FindRide.DTO.BookingHistoryDTO;
-import com.alpha.FindRide.DTO.FindCustomerDTO;
 import com.alpha.FindRide.DTO.RegisterCustomerDTO;
 import com.alpha.FindRide.Entity.Booking;
 import com.alpha.FindRide.Entity.Customer;
@@ -35,9 +34,9 @@ public class CustomerController {
 		return cs.saveCustomer(rdto);
 	}
 	
-	@PostMapping("/findCustomer")
-    public ResponseEntity<ResponseStructure<Customer>> findDriver(@RequestBody FindCustomerDTO fdto) {
-        return cs.findCustomer(fdto);
+	@GetMapping("/findCustomer")
+    public ResponseEntity<ResponseStructure<Customer>> findDriver(@RequestParam long mobileno) {
+        return cs.findCustomer(mobileno);
     }
 	
 	@DeleteMapping("/deleteCustomer")
@@ -45,19 +44,19 @@ public class CustomerController {
 		return cs.deleteCustomer(mobileno);
 	}
 
-	@PostMapping("/seeallAvailableVehicles")
+	@GetMapping("/seeallAvailableVehicles")
 	public ResponseEntity<ResponseStructure<AvailableVehicleDTO>> seeallAvailableVehicles(@RequestParam long mobileno,@RequestParam String destinationCity)
 	{
 		return cs.seeallAvailableVehicles(mobileno,destinationCity);
 	}
 	
-	@PostMapping("/seeBookingHistory")
+	@GetMapping("/seeBookingHistory")
 	public ResponseEntity<ResponseStructure<BookingHistoryDTO>> seeBookingHistory(@RequestParam long mobileno)
 	{
 		return cs.seeBookingHistory(mobileno);
 	}
 	
-	@PostMapping("/seeActiveBooking")
+	@GetMapping("/seeActiveBooking")
 	public ResponseEntity<ResponseStructure<ActiveBookingDTO>> seeActiveBooking(@RequestParam long mobileno)
 	{
 		return cs.seeActiveBooking(mobileno);
