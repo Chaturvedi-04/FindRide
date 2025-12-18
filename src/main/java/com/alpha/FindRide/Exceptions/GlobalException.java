@@ -89,7 +89,18 @@ public class GlobalException {
     	ResponseStructure<String> rs = new ResponseStructure<String>();
     	rs.setStatuscode(HttpStatus.NOT_ACCEPTABLE.value());
     	rs.setMessage("Source and destination cannot be the same");
-    	rs.setData(null);
+    	rs.setData("Source and destination cannot be the same");
     	return new ResponseEntity<ResponseStructure<String>>(rs,HttpStatus.NOT_ACCEPTABLE);
     }
+    
+    @ExceptionHandler(InvalidOtpException.class)
+    public ResponseEntity<ResponseStructure<String>> invalidOtpException(InvalidOtpException ex) {
+    	ResponseStructure<String> rs = new ResponseStructure<String>();
+    	rs.setStatuscode(HttpStatus.NOT_ACCEPTABLE.value());
+    	rs.setMessage("Invalid OTP");
+    	rs.setData("Invalid OTP");
+    	return new ResponseEntity<ResponseStructure<String>>(rs,HttpStatus.NOT_ACCEPTABLE);
+    }
+    
+    
 }

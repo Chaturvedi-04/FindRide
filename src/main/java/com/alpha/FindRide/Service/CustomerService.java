@@ -1,6 +1,5 @@
 package com.alpha.FindRide.Service;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,16 +21,13 @@ import com.alpha.FindRide.DTO.UpdateLocationDTO;
 import com.alpha.FindRide.DTO.VehicleDetailDTO;
 import com.alpha.FindRide.Entity.Booking;
 import com.alpha.FindRide.Entity.Customer;
-import com.alpha.FindRide.Entity.Driver;
 import com.alpha.FindRide.Entity.Vehicle;
 import com.alpha.FindRide.Exceptions.BookingNotFoundException;
 import com.alpha.FindRide.Exceptions.CustomerNotFoundException;
-import com.alpha.FindRide.Exceptions.DriverNotFoundException;
 import com.alpha.FindRide.Exceptions.InvalidDestinationLocationException;
 import com.alpha.FindRide.Exceptions.LocationFetchException;
 import com.alpha.FindRide.Exceptions.NoCurrentBookingException;
 import com.alpha.FindRide.Exceptions.SameSourceAndDestinationException;
-import com.alpha.FindRide.Exceptions.VehicleNotFoundException;
 import com.alpha.FindRide.Repository.BookingRepo;
 import com.alpha.FindRide.Repository.CustomerRepo;
 import com.alpha.FindRide.Repository.VehicleRepo;
@@ -92,11 +88,7 @@ public class CustomerService {
 	}
 
 	public ResponseEntity<ResponseStructure<Customer>> findCustomer(FindCustomerDTO cdto) {
-		Customer c = cr.findByMobileno(cdto.getMobileno());
-		if(c==null)
-		{
-			throw new CustomerNotFoundException();
-		}
+		Customer c = cr.findByMobileno(cdto.getMobileno()).orElseThrow(()->new CustomerNotFoundException());
         ResponseStructure<Customer> rs = new ResponseStructure<>();
         rs.setStatuscode(HttpStatus.FOUND.value());
         rs.setMessage("Customer with MobileNo " + cdto.getMobileno() + " found");
@@ -106,10 +98,7 @@ public class CustomerService {
 	}
 	
 	public ResponseEntity<ResponseStructure<String>> deleteCustomer(long mobileno){
-		Customer c = cr.findByMobileno(mobileno);
-		if(c == null) {
-			throw new CustomerNotFoundException();
-		}
+		Customer c = cr.findByMobileno(mobileno).orElseThrow(()->new CustomerNotFoundException());
 		cr.delete(c);
 		ResponseStructure<String> rs = new ResponseStructure<>();
 	    rs.setStatuscode(HttpStatus.OK.value());
@@ -120,10 +109,7 @@ public class CustomerService {
 
 	public ResponseEntity<ResponseStructure<AvailableVehicleDTO>> seeallAvailableVehicles(long mobileno, String destinationCity) {
 		
-		Customer c = cr.findByMobileno(mobileno);
-	    if (c == null) {
-	        throw new CustomerNotFoundException();
-	    }
+		Customer c = cr.findByMobileno(mobileno).orElseThrow(()->new CustomerNotFoundException());
 		String sourceLoc = c.getCurrentloc();
 		String destionationLoc = destinationCity;
 		double distance;
@@ -218,7 +204,7 @@ public class CustomerService {
 	}
 	
 	public ResponseEntity<ResponseStructure<BookingHistoryDTO>> seeBookingHistory(long mobileno) {
-		Customer c = cr.findByMobileno(mobileno);
+		Customer c = cr.findByMobileno(mobileno).orElseThrow(()->new CustomerNotFoundException());
 		List<Booking> blist = c.getBookingList();
 		List<RidedetailDTO> ridedetaildto = new ArrayList<RidedetailDTO>();
 		double totalamount=0;
@@ -245,15 +231,8 @@ public class CustomerService {
 
 
 	public ResponseEntity<ResponseStructure<ActiveBookingDTO>> seeActiveBooking(long mobileno) {
-		Customer c = cr.findByMobileno(mobileno);
-	    if (c == null) {
-	        throw new CustomerNotFoundException();
-	    }
-	    Booking b = vr.findActiveBookingOfCustomer(mobileno);
-	    if(b==null)
-	    {
-	    	throw new NoCurrentBookingException();
-	    }
+		Customer c = cr.findByMobileno(mobileno).orElseThrow(()->new CustomerNotFoundException());
+	    Booking b = vr.findActiveBookingOfCustomer(mobileno).orElseThrow(()->new NoCurrentBookingException());
 	    ActiveBookingDTO abdto = new ActiveBookingDTO();
 	    abdto.setBooking(b);
 	    abdto.setCustname(c.getName());
@@ -269,10 +248,7 @@ public class CustomerService {
 	
 	public ResponseEntity<ResponseStructure<Customer>> updateLocationDriver(UpdateLocationDTO udto) {
 
-	    Customer c = cr.findByMobileno(udto.getMobileno());
-	    if (c == null) {
-	        throw new CustomerNotFoundException();
-	    }
+	    Customer c = cr.findByMobileno(udto.getMobileno()).orElseThrow(()->new CustomerNotFoundException());
 	    try {
 	        String url = "https://us1.locationiq.com/v1/reverse?key=" + apiKey +
 	                "&lat=" + udto.getLatitude() +
@@ -302,9 +278,8 @@ public class CustomerService {
 	
 	public ResponseEntity<ResponseStructure<Booking>> cancelbooking(int customerid, int bookingid) {
 		
-		Customer c = cr.findById(customerid).orElseThrow(CustomerNotFoundException::new);
-
-		Booking book = br.findById(bookingid).orElseThrow(BookingNotFoundException::new);
+		Customer c = cr.findById(customerid).orElseThrow(()->new CustomerNotFoundException());
+		Booking book = br.findById(bookingid).orElseThrow(()->new BookingNotFoundException());
 
 //		Vehicle v= vr.findById(v.getId()).orElseThrow(()->new VehicleNotFoundException());
 				
@@ -341,5 +316,18 @@ public class CustomerService {
 		rs.setMessage("Booking cancelled successfully");
 		rs.setData(book);
 		return new ResponseEntity<ResponseStructure<Booking>>(rs,HttpStatus.OK);
+	}
+
+	public ResponseEntity<ResponseStructure<Integer>> getotp(int bookingid) 
+	{
+		Booking b = br.findById(bookingid).orElseThrow(()->new BookingNotFoundException());
+		int otp = (int)(Math.random() * 9000) + 1000;
+		b.setOtp(otp);
+		br.save(b);
+		ResponseStructure<Integer> rs = new ResponseStructure<Integer>();
+		rs.setStatuscode(HttpStatus.OK.value());
+		rs.setMessage("Otp generated");
+		rs.setData(otp);
+		return new ResponseEntity<ResponseStructure<Integer>>(rs,HttpStatus.OK);
 	}
 }

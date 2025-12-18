@@ -1,6 +1,7 @@
 package com.alpha.FindRide.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,9 +23,9 @@ public interface VehicleRepo extends JpaRepository<Vehicle, Integer>{
 	 public List<Booking> findAllCompletedBookingsOfDriver(long mobileno);
 	 
 	 @Query("SELECT b FROM Booking b WHERE b.cust.mobileno = :mobileno AND b.bookingStatus = 'BOOKED'")
-	 public Booking findActiveBookingOfCustomer(long mobileno);
+	 public Optional<Booking> findActiveBookingOfCustomer(long mobileno);
 	 
 	 @Query("SELECT b FROM Booking b WHERE b.driver.mobileno = :mobileno AND b.bookingStatus = 'BOOKED'")
-	 public Booking findActiveBookingOfDriver(long mobileno);
+	 public Optional<Booking> findActiveBookingOfDriver(long mobileno);
 	
 }
