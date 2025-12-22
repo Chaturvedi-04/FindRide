@@ -85,7 +85,6 @@ public class DriverService {
 		v.setCapacity(rdto.getVehicleCapacity());
 				
 		try {
-            // LocationIQ Reverse Geocoding
             String url = "https://us1.locationiq.com/v1/reverse?key=" + apiKey +
                     "&lat=" + rdto.getLatitude() +
                     "&lon=" + rdto.getLongitude() +
@@ -324,6 +323,8 @@ public class DriverService {
 	{	
 		Booking b = br.findById(bookingid).orElseThrow(()->new BookingNotFoundException());
 		if(otp!=b.getOtp()) throw new InvalidOtpException();
+		int otp1 = (int)(Math.random() * 9000) + 1000;
+		b.setOtp(otp1);
 		ResponseStructure<String> rs = new ResponseStructure<String>();
 		rs.setStatuscode(HttpStatus.OK.value());
 		rs.setMessage("OTP verified successfully");

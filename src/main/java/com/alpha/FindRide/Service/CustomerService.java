@@ -57,7 +57,6 @@ public class CustomerService {
 		c.setMobileno(rdto.getMobileno());
 		c.setEmailid(rdto.getEmailid());
 		try {
-            // LocationIQ Reverse Geocoding
             String url = "https://us1.locationiq.com/v1/reverse?key=" + apiKey +
                     "&lat=" + rdto.getLatitude() +
                     "&lon=" + rdto.getLongitude() +
@@ -116,7 +115,6 @@ public class CustomerService {
 	        RestTemplate restTemplate = new RestTemplate();
 	        ObjectMapper mapper = new ObjectMapper();
 
-	        // Step 1: Get source coordinates
 	        String srcUrl = "https://us1.locationiq.com/v1/search?key=" + apiKey +
 	                "&q=" + sourceLoc + "&format=json";
 
@@ -129,13 +127,11 @@ public class CustomerService {
 	        double srcLat = srcJson.get("lat").asDouble();
 	        double srcLon = srcJson.get("lon").asDouble();
 
-	        // Step 2: Get destination coordinates
 	        String destUrl = "https://us1.locationiq.com/v1/search?key=" + apiKey +
 	                "&q=" + destionationLoc + "&format=json";
 
 	        JsonNode destJsonArray = mapper.readTree(restTemplate.getForObject(destUrl, String.class));
 
-	        // 🚨 Check if destination is invalid
 	        if (destJsonArray == null || destJsonArray.isEmpty()) {
 	            throw new InvalidDestinationLocationException();
 	        }
@@ -144,12 +140,10 @@ public class CustomerService {
 	        double destLat = destJson.get("lat").asDouble();
 	        double destLon = destJson.get("lon").asDouble();
 	        
-	        // 🚨 NEW STEP: Check if source and destination are the same
 	        if (srcLat == destLat && srcLon == destLon) {
 	            throw new SameSourceAndDestinationException();
 	        }
 
-	        // Step 3: Use Directions API to get distance
 	        String directionUrl = String.format(
 	            "https://us1.locationiq.com/v1/directions/driving/%f,%f;%f,%f?key=%s",
 	            srcLon, srcLat, destLon, destLat, apiKey
@@ -158,7 +152,7 @@ public class CustomerService {
 	        JsonNode dirJson = mapper.readTree(restTemplate.getForObject(directionUrl, String.class));
 	        
 	        double distanceInMeters = dirJson.get("routes").get(0).get("distance").asDouble();
-	        distance = distanceInMeters / 1000; // Convert meters → kilometers
+	        distance = distanceInMeters / 1000;
 	        
 	    }
 	    catch (Exception e) {
@@ -173,7 +167,6 @@ public class CustomerService {
 
 	    AvailableVehicleDTO avd = new AvailableVehicleDTO();
 	    avd.setAvailableVehicles(new ArrayList<>());
-//	    avd.setPenaltyamount(penaltyamount * 100); 
 	    
 	    List<Vehicle> availableVehicles = vr.findByCurrentCity(sourceLoc);
 	    
@@ -315,18 +308,5 @@ public class CustomerService {
 		rs.setMessage("Booking cancelled successfully");
 		rs.setData(book);
 		return new ResponseEntity<ResponseStructure<Booking>>(rs,HttpStatus.OK);
-	}
-
-	public ResponseEntity<ResponseStructure<Integer>> getotp(int bookingid) 
-	{
-		Booking b = br.findById(bookingid).orElseThrow(()->new BookingNotFoundException());
-		int otp = (int)(Math.random() * 9000) + 1000;
-		b.setOtp(otp);
-		br.save(b);
-		ResponseStructure<Integer> rs = new ResponseStructure<Integer>();
-		rs.setStatuscode(HttpStatus.OK.value());
-		rs.setMessage("Otp generated");
-		rs.setData(otp);
-		return new ResponseEntity<ResponseStructure<Integer>>(rs,HttpStatus.OK);
 	}
 }
