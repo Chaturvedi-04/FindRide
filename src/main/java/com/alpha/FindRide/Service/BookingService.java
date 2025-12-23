@@ -83,8 +83,8 @@ public class BookingService {
 			b.setDistanceTravelled(bookingdto.getDistanceTravelled());
 			b.setBookingDate(LocalDate.now());
 			b.setBookingStatus("BOOKED");
-
-			//penalty added if the booking is cancelled
+			int otp = (int)(Math.random() * 9000) + 1000;
+			b.setOtp(otp);
 		    double baseFare = v.getPricePerKM() * bookingdto.getDistanceTravelled();
 		    double totalFare = baseFare;
 		    int penaltyCount = c.getPenaltyCount();
@@ -98,10 +98,8 @@ public class BookingService {
 			c.setBookingStatus(true);
 			v.getDriver().getBookingList().add(b);
 			v.setAvailableStatus("BOOKED");
-			d.setStatus("BOOKED");
 			cr.save(c);
 			vr.save(v);
-			dr.save(d);
 			
 			ActiveBookingDTO abdto = new ActiveBookingDTO();
 			abdto.setBooking(b);
