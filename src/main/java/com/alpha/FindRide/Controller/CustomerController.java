@@ -34,35 +34,35 @@ public class CustomerController {
 		return cs.saveCustomer(rdto);
 	}
 	
-	@GetMapping("/findCustomer")
+	@GetMapping("/auth/findCustomer")
     public ResponseEntity<ResponseStructure<Customer>> findDriver(@RequestParam long mobileno) {
         return cs.findCustomer(mobileno);
     }
 	
-	@DeleteMapping("/deleteCustomer")
+	@DeleteMapping("/auth/deleteCustomer")
 	public ResponseEntity<ResponseStructure<String>> deleteCustomer(@RequestParam long mobileno){
 		return cs.deleteCustomer(mobileno);
 	}
 
-	@GetMapping("/seeallAvailableVehicles")
+	@GetMapping("/auth/seeallAvailableVehicles")
 	public ResponseEntity<ResponseStructure<AvailableVehicleDTO>> seeallAvailableVehicles(@RequestParam long mobileno,@RequestParam String destinationCity)
 	{
 		return cs.seeallAvailableVehicles(mobileno,destinationCity);
 	}
 	
-	@GetMapping("/seeBookingHistory")
+	@GetMapping("/auth/seeBookingHistory")
 	public ResponseEntity<ResponseStructure<BookingHistoryDTO>> seeBookingHistory(@RequestParam long mobileno)
 	{
 		return cs.seeBookingHistory(mobileno);
 	}
 	
-	@GetMapping("/seeActiveBooking")
+	@GetMapping("/auth/seeActiveBooking")
 	public ResponseEntity<ResponseStructure<ActiveBookingDTO>> seeActiveBooking(@RequestParam long mobileno)
 	{
 		return cs.seeActiveBooking(mobileno);
 	}
 	
-	 @PostMapping("/cancelbooking")
+	 @PostMapping("/auth/cancelbooking")
 	 public ResponseEntity<ResponseStructure<Booking>> cancelBooking (@RequestParam int customerid,@RequestParam int bookingid)
 	 {
 		 return cs.cancelbooking(customerid, bookingid);

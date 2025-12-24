@@ -39,58 +39,58 @@ public class DriverController {
 		return ds.saveDriver(rdto);
 	}
 	
-	@GetMapping("/findDriver")
+	@GetMapping("/auth/findDriver")
     public ResponseEntity<ResponseStructure<Driver>> findDriver(@RequestParam long mobileno) {
         return ds.findDriver(mobileno);
     }
 	
-	 @PutMapping("/updateLocation")
+	 @PutMapping("/auth/updateLocation")
 	 public ResponseEntity<ResponseStructure<Driver>> updateLocation(@RequestBody UpdateLocationDTO udto) {
 	     return ds.updateLocation(udto);
 	 }
 	 
-	 @DeleteMapping("/deleteDriver")
+	 @DeleteMapping("/auth/deleteDriver")
 	 public ResponseEntity<ResponseStructure<String>> deleteDriver(@RequestParam long mobileno) {
 		 return ds.deleteDriver(mobileno);
 	 }
 	
-	 @GetMapping("/seeBookingHistory")
+	 @GetMapping("/auth/seeBookingHistory")
 	 public ResponseEntity<ResponseStructure<BookingHistoryDTO>> seeBookingHistory(@RequestParam long mobileno)
 	 {
 		return ds.seeBookingHistory(mobileno);
 	 }
 	 
-	 @GetMapping("/seeActiveBooking")
+	 @GetMapping("/auth/seeActiveBooking")
 	 public ResponseEntity<ResponseStructure<ActiveBookingDriverDTO>> seeActiveBooking(@RequestParam long mobileno)
 	 {
 		return ds.seeActiveBooking(mobileno);
 	 }
 	 
-	 @PostMapping("/completeride/payByCash")
+	 @PostMapping("/auth/completeride/payByCash")
 	 public ResponseEntity<ResponseStructure<PaymentDTO>> completePayment(@RequestParam int bookingid,@RequestParam String paytype,@RequestParam int otp)
 	 {
 		 return ds.completePayment(bookingid, paytype,otp);
 	 }
 	 
-	 @PostMapping("/completeride/payByUpi")
+	 @PostMapping("/auth/completeride/payByUpi")
 	 public ResponseEntity<ResponseStructure<upiPaymentDTO>> paymentService(@RequestParam int bookingid,@RequestParam String paytype)
 	 {
 		 return ds.paymentService(bookingid, paytype);
 	 }
 	 
-	 @PostMapping("/ridecompleted/paymentconfirmed")
+	 @PostMapping("/auth/ridecompleted/paymentconfirmed")
 	 public ResponseEntity<ResponseStructure<PaymentDTO>> confrimPaymentCollection(@RequestParam int bookingid,@RequestParam String paytype,@RequestParam int otp)
 	 {
 		 return ds.confrimPaymentCollection(bookingid,paytype,otp);
 	 }
 	 
-	 @PostMapping("/cancelbooking")
+	 @PostMapping("/auth/cancelbooking")
 	 public ResponseEntity<ResponseStructure<Booking>> cancelbooking(@RequestParam int driverid,@RequestParam int bookingid)
 	 {
 		 return ds.cancelbooking(driverid,bookingid);
 	 }
 	 
-	 @PostMapping("/startride")
+	 @PostMapping("/auth/startride")
 	 public ResponseEntity<ResponseStructure<String>> startride(@RequestParam int otp,@RequestParam int bookingid)
 	 {
 		 return ds.startride(otp,bookingid);
