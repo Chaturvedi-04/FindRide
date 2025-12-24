@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -53,13 +54,17 @@ public class CustomerService {
 	
 	@Autowired
 	private AppUserRepo ar;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
 
 	public ResponseEntity<ResponseStructure<Customer>> saveCustomer(RegisterCustomerDTO rdto) {
 		
-		//setting user
+		
 		AppUser a = new AppUser();
 		a.setMobileno(rdto.getMobileno());
-		a.setPassword(rdto.getPassword());
+		a.setPassword(passwordEncoder.encode(rdto.getPassword()));
 		a.setRole("CUSTOMER");
 		ar.save(a);
 		
