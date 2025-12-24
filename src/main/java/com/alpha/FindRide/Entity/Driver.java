@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 
@@ -24,6 +25,14 @@ public class Driver {
 	private long mobileno;
 	private String gender;
 	private String mailid;
+	
+	@OneToOne(optional = false)
+    @JoinColumn(
+        name = "user_id",
+        nullable = false,
+        unique = true
+    )
+    private AppUser user;
 	
 	@OneToOne(mappedBy = "driver", cascade = CascadeType.ALL)
 	private Vehicle vehicle;
@@ -103,6 +112,14 @@ public class Driver {
 		this.mailid = mailid;
 	}
 
+	public AppUser getAppUser() {
+		return user;
+	}
+
+	public void setUser(AppUser user) {
+		this.user = user;
+	}
+
 	public Vehicle getVehicle() {
 		return vehicle;
 	}
@@ -119,10 +136,9 @@ public class Driver {
 		this.bookingList = bookingList;
 	}
 
-	public Driver(int id, long licenseNo, String upiid, String name, String status, int age, long mobileno,
-			String gender, String mailid, Vehicle vehicle, List<Booking> bookingList) {
+	public Driver(long licenseNo, String upiid, String name, String status, int age, long mobileno, String gender,
+			String mailid, AppUser user, Vehicle vehicle, List<Booking> bookingList) {
 		super();
-		this.id = id;
 		this.licenseNo = licenseNo;
 		this.upiid = upiid;
 		this.name = name;
@@ -131,6 +147,7 @@ public class Driver {
 		this.mobileno = mobileno;
 		this.gender = gender;
 		this.mailid = mailid;
+		this.user = user;
 		this.vehicle = vehicle;
 		this.bookingList = bookingList;
 	}
@@ -143,6 +160,7 @@ public class Driver {
 	public String toString() {
 		return "Driver [id=" + id + ", licenseNo=" + licenseNo + ", upiid=" + upiid + ", name=" + name + ", status="
 				+ status + ", age=" + age + ", mobileno=" + mobileno + ", gender=" + gender + ", mailid=" + mailid
-				+ ", vehicle=" + vehicle + ", bookingList=" + bookingList + "]";
+				+ ", user=" + user + ", vehicle=" + vehicle + ", bookingList=" + bookingList + "]";
 	}
+
 }

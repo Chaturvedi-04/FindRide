@@ -21,6 +21,7 @@ import com.alpha.FindRide.DTO.RegisterDriverVehicleDTO;
 import com.alpha.FindRide.DTO.RidedetailDTO;
 import com.alpha.FindRide.DTO.UpdateLocationDTO;
 import com.alpha.FindRide.DTO.upiPaymentDTO;
+import com.alpha.FindRide.Entity.AppUser;
 import com.alpha.FindRide.Entity.Booking;
 import com.alpha.FindRide.Entity.Customer;
 import com.alpha.FindRide.Entity.Driver;
@@ -32,6 +33,7 @@ import com.alpha.FindRide.Exceptions.InvalidOtpException;
 import com.alpha.FindRide.Exceptions.LocationFetchException;
 import com.alpha.FindRide.Exceptions.NoCurrentBookingException;
 import com.alpha.FindRide.Exceptions.VehicleNotFoundException;
+import com.alpha.FindRide.Repository.AppUserRepo;
 import com.alpha.FindRide.Repository.BookingRepo;
 import com.alpha.FindRide.Repository.CustomerRepo;
 import com.alpha.FindRide.Repository.DriverRepo;
@@ -63,7 +65,16 @@ public class DriverService {
 	@Autowired
 	private PaymentRepo pr;
 
+	@Autowired
+	private AppUserRepo ar;
+	
 	public ResponseEntity<ResponseStructure<Driver>> saveDriver(RegisterDriverVehicleDTO rdto) {
+		
+		AppUser a = new AppUser();
+		a.setMobileno(rdto.getMobileno());
+		a.setPassword(rdto.getPassword());
+		a.setRole("DRIVER");
+		ar.save(a);
 		
 		Driver d = new Driver();
 		d.setLicenseNo(rdto.getLicenseNo());
@@ -73,6 +84,7 @@ public class DriverService {
 		d.setMobileno(rdto.getMobileno());
 		d.setGender(rdto.getGender());
 		d.setMailid(rdto.getMailid());
+		d.setUser(a);
 		dr.save(d);
 		
 		Vehicle v = new Vehicle();

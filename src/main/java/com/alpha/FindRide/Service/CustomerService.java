@@ -18,6 +18,7 @@ import com.alpha.FindRide.DTO.RegisterCustomerDTO;
 import com.alpha.FindRide.DTO.RidedetailDTO;
 import com.alpha.FindRide.DTO.UpdateLocationDTO;
 import com.alpha.FindRide.DTO.VehicleDetailDTO;
+import com.alpha.FindRide.Entity.AppUser;
 import com.alpha.FindRide.Entity.Booking;
 import com.alpha.FindRide.Entity.Customer;
 import com.alpha.FindRide.Entity.Vehicle;
@@ -27,6 +28,7 @@ import com.alpha.FindRide.Exceptions.InvalidDestinationLocationException;
 import com.alpha.FindRide.Exceptions.LocationFetchException;
 import com.alpha.FindRide.Exceptions.NoCurrentBookingException;
 import com.alpha.FindRide.Exceptions.SameSourceAndDestinationException;
+import com.alpha.FindRide.Repository.AppUserRepo;
 import com.alpha.FindRide.Repository.BookingRepo;
 import com.alpha.FindRide.Repository.CustomerRepo;
 import com.alpha.FindRide.Repository.VehicleRepo;
@@ -48,14 +50,26 @@ public class CustomerService {
 	
 	@Autowired
 	private BookingRepo br;
+	
+	@Autowired
+	private AppUserRepo ar;
 
 	public ResponseEntity<ResponseStructure<Customer>> saveCustomer(RegisterCustomerDTO rdto) {
+		
+		//setting user
+		AppUser a = new AppUser();
+		a.setMobileno(rdto.getMobileno());
+		a.setPassword(rdto.getPassword());
+		a.setRole("CUSTOMER");
+		ar.save(a);
+		
 		Customer c = new Customer();
 		c.setName(rdto.getName());
 		c.setAge(rdto.getAge());
 		c.setGender(rdto.getGender());
 		c.setMobileno(rdto.getMobileno());
 		c.setEmailid(rdto.getEmailid());
+		c.setUser(a);
 		try {
             String url = "https://us1.locationiq.com/v1/reverse?key=" + apiKey +
                     "&lat=" + rdto.getLatitude() +

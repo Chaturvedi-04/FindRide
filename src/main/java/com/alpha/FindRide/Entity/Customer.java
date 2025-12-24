@@ -9,7 +9,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 
 
 @Entity
@@ -26,11 +28,19 @@ public class Customer {
 	private boolean bookingStatus=false;
 	private int penaltyCount = 0;
 	
+	@OneToOne(optional = false)
+    @JoinColumn(
+        name = "user_id",
+        nullable = false,
+        unique = true
+    )
+    private AppUser user;
+	
 	@OneToMany(mappedBy = "cust", cascade = CascadeType.ALL)
 	@JsonIgnore
 	private List<Booking> bookingList;
 	public Customer(String name, int age, String gender, long mobileno, String emailid, String currentloc,
-			boolean bookingStatus, int penaltyCount, List<Booking> bookingList) {
+			boolean bookingStatus, int penaltyCount, AppUser user, List<Booking> bookingList) {
 		super();
 		this.name = name;
 		this.age = age;
@@ -40,6 +50,7 @@ public class Customer {
 		this.currentloc = currentloc;
 		this.bookingStatus = bookingStatus;
 		this.penaltyCount = penaltyCount;
+		this.user = user;
 		this.bookingList = bookingList;
 	}
 	public Customer() {
@@ -99,6 +110,12 @@ public class Customer {
 	public void setPenaltyCount(int penaltyCount) {
 		this.penaltyCount = penaltyCount;
 	}
+	public AppUser getAppUser() {
+		return user;
+	}
+	public void setUser(AppUser user) {
+		this.user = user;
+	}
 	public List<Booking> getBookingList() {
 		return bookingList;
 	}
@@ -109,7 +126,8 @@ public class Customer {
 	public String toString() {
 		return "Customer [id=" + id + ", name=" + name + ", age=" + age + ", gender=" + gender + ", mobileno="
 				+ mobileno + ", emailid=" + emailid + ", currentloc=" + currentloc + ", bookingStatus=" + bookingStatus
-				+ ", penaltyCount=" + penaltyCount + ", bookingList=" + bookingList + "]";
-	}	
+				+ ", penaltyCount=" + penaltyCount + ", Appuser=" + user + ", bookingList=" + bookingList + "]";
+	}
+	
 	
 }
