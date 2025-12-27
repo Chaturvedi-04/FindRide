@@ -1,7 +1,5 @@
 package com.alpha.FindRide.Controller;
 
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -95,4 +93,12 @@ public class DriverController {
 	 {
 		 return ds.startride(otp,bookingid);
 	 }
+	 
+	 @PutMapping("/auth/updateStatus")
+	 public ResponseEntity<ResponseStructure<Driver>> updateDriverStatus(
+	         @RequestParam long mobileno,
+	         @RequestParam boolean active) {
+	     return ds.updateDriverStatus(mobileno, active);
+	 }
+
 }

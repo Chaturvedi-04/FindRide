@@ -13,7 +13,7 @@ import com.alpha.FindRide.Entity.Vehicle;
 @Repository
 public interface VehicleRepo extends JpaRepository<Vehicle, Integer>{
 
-	 @Query("SELECT v FROM Vehicle v " + "WHERE v.currentCity = :sourceLoc AND v.availableStatus = 'Available'")
+	 @Query("SELECT v FROM Vehicle v " + "WHERE v.currentCity = :sourceLoc AND v.availableStatus = 'AVAILABLE'")
 	public List<Vehicle> findByCurrentCity(String sourceLoc);
 	 
 	 @Query("SELECT b FROM Booking b WHERE b.cust.mobileno = :mobileno AND b.bookingStatus = 'COMPLETED'")
