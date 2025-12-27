@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Active Ride</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="center">
+  <div class="card wide">
+    <h2>Active Booking</h2>
+    <pre id="activeData"></pre>
+  </div>
+
+<script src="js/api.js"></script>
+<script>
+API.customer.active(localStorage.mobile).then(r=>{
+  document.getElementById("activeData").innerText = JSON.stringify(r.data,null,2);
+});
+</script>
+</body>
+</html>

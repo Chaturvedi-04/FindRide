@@ -1,0 +1,46 @@
+body{
+  background: radial-gradient(#06162b,#000814);
+  font-family: Poppins, sans-serif;
+  color:white;
+  margin:0;
+}
+
+.glass{
+  background: rgba(255,255,255,.08);
+  border-radius: 16px;
+  padding:20px;
+  backdrop-filter: blur(10px);
+  box-shadow:0 0 35px rgba(0,200,255,.25);
+  animation:fade .5s ease;
+}
+
+button{
+  padding:10px 15px;
+  border-radius:10px;
+  border:none;
+  cursor:pointer;
+  margin-top:6px;
+}
+
+.primary{background:#0ea5e9}
+.success{background:#22c55e}
+.danger{background:#ef4444}
+.secondary{background:#4b5563}
+
+.logo{
+  width:160px;
+  border-radius:14px;
+  box-shadow:0 0 25px rgba(0,200,255,.4)
+}
+
+input{
+  width:100%;
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  margin-top:6px;
+}
+
+.card{margin-top:20px}
+
+@keyframes fade { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:none;} }

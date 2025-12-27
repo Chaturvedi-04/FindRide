@@ -1,74 +1,66 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8" />
-  <title>FindRide · Driver</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="stylesheet" href="/css/styles.css">
+<link rel="stylesheet" href="css/style.css">
+<script type="module" src="js/driver.js"></script>
 </head>
+
 <body>
-  <header class="topbar">
-    <div class="brand">FindRide</div>
-    <nav>
-      <a href="/index.html">Home</a>
-      <a href="/customer.html">Customer</a>
-      <a href="/driver.html" class="active">Driver</a>
-    </nav>
-  </header>
 
-  <main class="container">
-    <h2>Driver Console</h2>
+<div class="glass">
 
-    <section class="split">
-      <div class="panel">
-        <h3>Register Driver & Vehicle</h3>
-        <form id="registerDriverForm">
-          <input name="licenseNo" placeholder="License No" />
-          <input name="upiid" placeholder="UPI ID" />
-          <input name="driverName" placeholder="Driver name" required />
-          <input name="age" type="number" placeholder="Age" />
-          <input name="mobileno" placeholder="Mobile number" required />
-          <input name="gender" placeholder="Gender" />
-          <input name="mailid" placeholder="Email" />
-          <input name="vehicleName" placeholder="Vehicle name" />
-          <input name="vehicleNo" placeholder="Vehicle no (plate)" />
-          <input name="vehicleType" placeholder="Vehicle type (car/bike)" />
-          <input name="model" placeholder="Model" />
-          <input name="vehicleCapacity" type="number" placeholder="Capacity" />
-          <input name="latitude" placeholder="Latitude" required />
-          <input name="longitude" placeholder="Longitude" required />
-          <input name="pricePerKM" type="number" placeholder="Price per KM" />
-          <input name="averageSpeed" type="number" placeholder="Average speed (km/h)" />
-          <button class="btn" type="submit">Save Driver</button>
-        </form>
-        <pre id="registerDriverResult" class="result"></pre>
-      </div>
+<h2>Driver Panel</h2>
 
-      <div class="panel">
-        <h3>Find / Update / Delete</h3>
-        <form id="findDriverForm">
-          <input name="mobileno" placeholder="Mobile number" required />
-          <button class="btn" type="submit">Find Driver</button>
-        </form>
+<input id="d_name" placeholder="Name">
+<input id="d_age" placeholder="Age">
+<input id="d_gender" placeholder="Gender">
+<input id="d_mobile" placeholder="Mobile">
+<input id="d_email" placeholder="Email">
+<input id="d_pass" placeholder="Password">
+<input id="d_upi" placeholder="UPI ID">
 
-        <form id="updateLocationForm" style="margin-top:12px">
-          <input name="mobileno" placeholder="Driver mobile no" required />
-          <input name="latitude" placeholder="Latitude" required />
-          <input name="longitude" placeholder="Longitude" required />
-          <button class="btn" type="submit">Update Location</button>
-        </form>
+<h3>Vehicle Details</h3>
 
-        <div style="margin-top:12px">
-          <input id="deleteDriverMobileno" placeholder="Mobile number to delete" />
-          <button id="deleteDriverBtn" class="btn ghost">Delete Driver</button>
-        </div>
+<input id="v_name" placeholder="Vehicle Name">
+<input id="v_no" placeholder="Number">
+<input id="v_type" placeholder="Type">
+<input id="v_model" placeholder="Model">
+<input id="v_capacity" placeholder="Capacity">
+<input id="v_lat" placeholder="Latitude">
+<input id="v_lon" placeholder="Longitude">
+<input id="v_price" placeholder="Price Per KM">
+<input id="v_speed" placeholder="Avg Speed">
 
-        <pre id="driverOpsResult" class="result"></pre>
-      </div>
-    </section>
-  </main>
+<button onclick="registerDriver()" class="primary">Register</button>
 
-  <footer class="footer">© FindRide</footer>
-  <script src="/js/app.js"></script>
+<hr>
+
+<button onclick="setAvailable('AVAILABLE')" class="success">AVAILABLE</button>
+<button onclick="setAvailable('NOT AVAILABLE')" class="danger">NOT AVAILABLE</button>
+
+<hr>
+
+<button onclick="activeD()">See Active Booking</button>
+<div id="driverActive"></div>
+
+<input id="booking_id" placeholder="Booking ID">
+<input id="otp_start" placeholder="Start OTP">
+<button onclick="startRide()">Start Ride</button>
+
+<input id="otp_pay" placeholder="Payment OTP">
+
+<button onclick="payCash()">Cash Payment</button>
+<button onclick="payUpi()">UPI Payment</button>
+<button onclick="confirmPayment()">Confirm Payment</button>
+
+<div id="qrArea"></div>
+
+<hr>
+
+<button onclick="historyD()">Booking History</button>
+<div id="driverHistory"></div>
+
+</div>
+
 </body>
 </html>

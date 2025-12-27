@@ -121,7 +121,7 @@ public class DriverService {
 		catch (Exception e) {
             throw new RuntimeException("Error fetching location from LocationIQ: " + e.getMessage());
         }
-		v.setAvailableStatus("Available");
+		v.setAvailableStatus("AVAILABLE");
 		v.setPricePerKM(rdto.getPricePerKM());
 		v.setAverageSpeed(rdto.getAverageSpeed());
 		d.setVehicle(v);
@@ -249,7 +249,7 @@ public class DriverService {
 		    c.setPenaltyCount(0);
 		}
 		Vehicle v = b.getVehicle();
-		v.setAvailableStatus("Available");
+		v.setAvailableStatus("AVAILABLE");
 		v.setCurrentCity(b.getDestinationLoc());
 		Payment p = new Payment();
 		p.setVehicle(v);
@@ -311,7 +311,7 @@ public class DriverService {
 		Booking book = br.findById(bookingid).orElseThrow(()->new BookingNotFoundException());
 		for(Booking b:blist)
 		{
-			if(b.getBookingStatus()=="CANCELLED By DRIVER")
+			if(b.getBookingStatus()=="CANCELLED_BY_DRIVER")
 			{
 				cancelcount++;
 			}
@@ -320,11 +320,11 @@ public class DriverService {
 		if(cancelcount>=4)
 		{
 			d.setStatus("BLOCKED");
-			book.setBookingStatus("CANCELLED");
+			book.setBookingStatus("CANCELLED_BY_DRIVER");
 		}
 		else if(cancelcount<4)
 		{
-			book.setBookingStatus("CANCELLED");
+			book.setBookingStatus("CANCELLED_BY_DRIVER");
 		}
 		dr.save(d);
 		br.save(book);
@@ -346,6 +346,35 @@ public class DriverService {
 		rs.setMessage("OTP verified successfully");
 		rs.setData("OTP verified successfully");
 		return new ResponseEntity<ResponseStructure<String>>(rs,HttpStatus.OK);
+	}
+
+	public ResponseEntity<ResponseStructure<Driver>> updateDriverStatus(long mobileno, boolean active) 
+	{
+	    Driver d = dr.findByMobileno(mobileno).orElseThrow(() -> new DriverNotFoundException());
+	    Vehicle v = d.getVehicle();
+	    if (v == null) {
+	        throw new RuntimeException("Vehicle not assigned for this driver");
+	    }
+
+	    if (active) 
+	    {
+	        d.setStatus("AVAILABLE");
+	        v.setAvailableStatus("AVAILABLE");
+	    } 
+	    else 
+	    {
+	        d.setStatus("NOT_AVAILABLE");
+	        v.setAvailableStatus("NOT_AVAILABLE");
+	    }
+
+	    vr.save(v);
+	    dr.save(d);
+
+	    ResponseStructure<Driver> rs = new ResponseStructure<>();
+	    rs.setStatuscode(HttpStatus.OK.value());
+	    rs.setMessage("Driver status updated to " + d.getStatus());
+	    rs.setData(d);
+	    return new ResponseEntity<ResponseStructure<Driver>>(rs, HttpStatus.OK);
 	}
 
 }

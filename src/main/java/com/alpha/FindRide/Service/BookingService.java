@@ -75,7 +75,7 @@ public class BookingService {
 			b.setCust(c);
 			b.setVehicle(v);
 			b.setDriver(d);
-			b.setPaymentStatus("NOT PAID");
+			b.setPaymentStatus("NOT_PAID");
 			b.setSourceLoc(bookingdto.getSourceLoc());
 			b.setDestinationLoc(bookingdto.getDestinationLoc());
 			b.setFare(bookingdto.getFare());

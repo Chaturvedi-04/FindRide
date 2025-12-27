@@ -1,68 +1,45 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8" />
-  <title>FindRide · Customer</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="stylesheet" href="/css/styles.css">
+<link rel="stylesheet" href="css/style.css">
+<script type="module" src="js/customer.js"></script>
 </head>
+
 <body>
-  <header class="topbar">
-    <div class="brand">FindRide</div>
-    <nav>
-      <a href="/index.html">Home</a>
-      <a href="/customer.html" class="active">Customer</a>
-      <a href="/driver.html">Driver</a>
-    </nav>
-  </header>
 
-  <main class="container">
-    <h2>Customer Console</h2>
+<div class="glass">
 
-    <section class="split">
-      <div class="panel">
-        <h3>Register Customer</h3>
-        <form id="registerCustomerForm">
-          <input name="name" placeholder="Name" required />
-          <input name="age" type="number" placeholder="Age" required />
-          <input name="gender" placeholder="Gender" />
-          <input name="mobileno" placeholder="Mobile number" required />
-          <input name="emailid" type="email" placeholder="Email" />
-          <input name="latitude" placeholder="Latitude (ex: 17.3850)" required />
-          <input name="longitude" placeholder="Longitude (ex: 78.4867)" required />
-          <button class="btn" type="submit">Save Customer</button>
-        </form>
-        <pre id="registerCustomerResult" class="result"></pre>
-      </div>
+<h2>Customer Panel</h2>
 
-      <div class="panel">
-        <h3>Find / Delete Customer</h3>
-        <form id="findCustomerForm">
-          <input name="mobileno" placeholder="Mobile number" required />
-          <button class="btn" type="submit">Find Customer</button>
-        </form>
-        <button id="deleteCustomerBtn" class="btn ghost">Delete Customer by Mobile</button>
-        <div style="margin-top:12px">
-          <input id="deleteMobileno" placeholder="Mobile number to delete" />
-        </div>
-        <pre id="findCustomerResult" class="result"></pre>
-      </div>
-    </section>
+<input id="c_name" placeholder="Name">
+<input id="c_age" placeholder="Age">
+<input id="c_gender" placeholder="Gender">
+<input id="c_mobile" placeholder="Mobile">
+<input id="c_email" placeholder="Email">
+<input id="c_pass" placeholder="Password">
+<input id="c_lat" placeholder="Latitude">
+<input id="c_lon" placeholder="Longitude">
 
-    <hr />
+<button class="primary" onclick="registerCustomer()">Register</button>
 
-    <section class="panel">
-      <h3>See Available Vehicles</h3>
-      <form id="seeVehiclesForm">
-        <input name="mobileno" placeholder="Your mobile number (customer)" required />
-        <input name="destinationCity" placeholder="Destination city (name)" required />
-        <button class="btn" type="submit">Search Vehicles</button>
-      </form>
-      <pre id="seeVehiclesResult" class="result"></pre>
-    </section>
-  </main>
+<hr>
 
-  <footer class="footer">© FindRide</footer>
-  <script src="/js/app.js"></script>
+<input id="dest_city" placeholder="Destination City">
+<button class="success" onclick="getVehicles()">See Available Vehicles</button>
+
+<div id="vehicleList"></div>
+
+<hr>
+
+<button onclick="active()">See Active Booking</button>
+<div id="activeBook"></div>
+
+<hr>
+
+<button onclick="historyC()">Booking History</button>
+<div id="custHistory"></div>
+
+</div>
+
 </body>
 </html>
