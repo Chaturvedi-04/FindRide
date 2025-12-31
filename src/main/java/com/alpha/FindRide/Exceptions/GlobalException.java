@@ -102,5 +102,13 @@ public class GlobalException {
     	return new ResponseEntity<ResponseStructure<String>>(rs,HttpStatus.NOT_ACCEPTABLE);
     }
     
+    @ExceptionHandler(AppUserNotFoundException.class)
+    public ResponseEntity<ResponseStructure<String>> AppUserNotFoundException(AppUserNotFoundException ex) {
+    	ResponseStructure<String> rs = new ResponseStructure<String>();
+    	rs.setStatuscode(HttpStatus.NOT_ACCEPTABLE.value());
+    	rs.setMessage("Invalid user mobile number");
+    	rs.setData("Invalid user mobile number");
+    	return new ResponseEntity<ResponseStructure<String>>(rs,HttpStatus.NOT_ACCEPTABLE);
+    }
     
 }

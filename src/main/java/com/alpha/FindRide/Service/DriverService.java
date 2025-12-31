@@ -135,51 +135,55 @@ public class DriverService {
 		return new ResponseEntity<ResponseStructure<Driver>>(rs,HttpStatus.CREATED);
 	}
 	
-	public ResponseEntity<ResponseStructure<Driver>> findDriver(long mobileno) {
-	    Driver d = dr.findByMobileno(mobileno).orElseThrow(()->new DriverNotFoundException());
-        ResponseStructure<Driver> rs = new ResponseStructure<>();
-        rs.setStatuscode(HttpStatus.FOUND.value());
-        rs.setMessage("Driver with MobileNo " + mobileno + " found");
-        rs.setData(d);
+	public ResponseEntity<ResponseStructure<Driver>> findDriver(long mobile) {
 
-        return new ResponseEntity<ResponseStructure<Driver>>(rs,HttpStatus.FOUND);
+	    Driver d = dr.findByMobileno(mobile).orElseThrow(DriverNotFoundException::new);
+
+	    ResponseStructure<Driver> rs = new ResponseStructure<>();
+	    rs.setStatuscode(HttpStatus.OK.value());
+	    rs.setMessage("Driver fetched");
+	    rs.setData(d);
+
+	    return ResponseEntity.ok(rs);
 	}
 
-	public ResponseEntity<ResponseStructure<Driver>> updateLocation(UpdateLocationDTO udto) {
 
-		    Driver d = dr.findByMobileno(udto.getMobileno()).orElseThrow(()->new DriverNotFoundException());
-		    Vehicle v = d.getVehicle();
-		    if (v == null) {
-		        throw new RuntimeException("Vehicle not assigned for this driver");
-		    }
-		    try {
-		        String url = "https://us1.locationiq.com/v1/reverse?key=" + apiKey +
-		                "&lat=" + udto.getLatitude() +
-		                "&lon=" + udto.getLongitude() +
-		                "&format=json";
+	public ResponseEntity<ResponseStructure<Driver>> updateLocation(long mobile,UpdateLocationDTO udto) {
 
-		        RestTemplate restTemplate = new RestTemplate();
-		        ObjectMapper mapper = new ObjectMapper();
-		        
-		        JsonNode json = mapper.readTree(restTemplate.getForObject(url, String.class));
+	    Driver d = dr.findByMobileno(mobile).orElseThrow(DriverNotFoundException::new);
 
-		        String city = json.get("address").get("city").asString();
-		        v.setCurrentCity(city);
+	    Vehicle v = d.getVehicle();
+	    
+	    if (v == null) throw new VehicleNotFoundException();
 
-		    } catch (Exception e) {
-		        throw new LocationFetchException("Failed to fetch location from LocationIQ: " + e.getMessage());
-		    }
+	    try {
+	        String url = "https://us1.locationiq.com/v1/reverse?key=" + apiKey +
+	                "&lat=" + udto.getLatitude() +
+	                "&lon=" + udto.getLongitude() +
+	                "&format=json";
 
-		    vr.save(v);
-		    d.setVehicle(v);
+	        RestTemplate rt = new RestTemplate();
+	        ObjectMapper mapper = new ObjectMapper();
+	        JsonNode json = mapper.readTree(rt.getForObject(url, String.class));
 
-		    ResponseStructure<Driver> rs = new ResponseStructure<>();
-		    rs.setStatuscode(HttpStatus.OK.value());
-		    rs.setMessage("Driver location updated successfully");
-		    rs.setData(d);
-		    return new ResponseEntity<ResponseStructure<Driver>>(rs,HttpStatus.OK);
+	        String city = json.get("address").get("city").asText();
+	        v.setCurrentCity(city);
 
+	    } 
+	    catch (Exception e) {
+	        throw new LocationFetchException("Location fetch failed");
+	    }
+
+	    vr.save(v);
+
+	    ResponseStructure<Driver> rs = new ResponseStructure<>();
+	    rs.setStatuscode(HttpStatus.OK.value());
+	    rs.setMessage("Location updated");
+	    rs.setData(d);
+
+	    return ResponseEntity.ok(rs);
 	}
+
 
 	public ResponseEntity<ResponseStructure<String>> deleteDriver(long mobileno) {
 		Driver d = dr.findByMobileno(mobileno).orElseThrow(()->new DriverNotFoundException());
@@ -235,134 +239,155 @@ public class DriverService {
 		return new ResponseEntity<ResponseStructure<ActiveBookingDriverDTO>>(rs,HttpStatus.OK);
 	}
 
-	public ResponseEntity<ResponseStructure<PaymentDTO>> completePayment(int bookingid,String paytype, int otp) {
-		Booking b = br.findById(bookingid).orElseThrow(()->new BookingNotFoundException());
-		if(b.getOtp()!=otp) throw new InvalidOtpException();
-		b.setBookingStatus("COMPLETED");
-		b.setPaymentStatus("PAID");
-		
-		Customer c = b.getCust();
-		c.setBookingStatus(false);
-		c.setCurrentloc(b.getDestinationLoc());
-		
-		if(c.getPenaltyCount() > 0) {
-		    c.setPenaltyCount(0);
-		}
-		Vehicle v = b.getVehicle();
-		v.setAvailableStatus("AVAILABLE");
-		v.setCurrentCity(b.getDestinationLoc());
-		Payment p = new Payment();
-		p.setVehicle(v);
-		p.setCustomer(c);
-		p.setBooking(b);
-		p.setAmount(b.getFare());
-		p.setPaymentType(paytype);
-		pr.save(p);
-		b.setPayment(p);
-		cr.save(c);
-		vr.save(v);
-		br.save(b);
-		PaymentDTO pdto = new PaymentDTO();
-		pdto.setBooking(b);
-		pdto.setCustomer(c);
-		pdto.setPayment(p);
-		pdto.setVehicle(v);
-		ResponseStructure<PaymentDTO> rs = new ResponseStructure<PaymentDTO>();
-		rs.setStatuscode(HttpStatus.OK.value());
-		rs.setMessage("Payment Done using "+paytype);
-		rs.setData(pdto);
-		return new ResponseEntity<ResponseStructure<PaymentDTO>>(rs,HttpStatus.OK);
+	public ResponseEntity<ResponseStructure<PaymentDTO>> completePayment(long driverMobile,int bookingId,String paytype,int otp) {
+
+	    Booking b = br.findById(bookingId).orElseThrow(()-> new BookingNotFoundException());
+
+	    if (otp != b.getOtp()) {
+	        throw new InvalidOtpException();
+	    }
+
+	    b.setBookingStatus("COMPLETED");
+	    b.setPaymentStatus("PAID");
+
+	    Customer c = b.getCust();
+	    c.setBookingStatus(false);
+	    c.setCurrentloc(b.getDestinationLoc());
+	    c.setPenaltyCount(0);
+
+	    Vehicle v = b.getVehicle();
+	    v.setAvailableStatus("AVAILABLE");
+	    v.setCurrentCity(b.getDestinationLoc());
+
+	    
+	    Payment p = new Payment();
+	    p.setBooking(b);
+	    p.setCustomer(c);
+	    p.setVehicle(v);
+	    p.setAmount(b.getFare());
+	    p.setPaymentType(paytype);
+
+	    pr.save(p);
+
+	    b.setPayment(p);
+	    br.save(b);
+	    cr.save(c);
+	    vr.save(v);
+
+	    PaymentDTO pdto = new PaymentDTO();
+	    pdto.setBooking(b);
+	    pdto.setCustomer(c);
+	    pdto.setVehicle(v);
+	    pdto.setPayment(p);
+
+	    ResponseStructure<PaymentDTO> rs = new ResponseStructure<>();
+	    rs.setStatuscode(HttpStatus.OK.value());
+	    rs.setMessage("Payment completed using " + paytype);
+	    rs.setData(pdto);
+
+	    return new ResponseEntity<ResponseStructure<PaymentDTO>>(rs,HttpStatus.OK);
 	}
+	
+	public ResponseEntity<ResponseStructure<upiPaymentDTO>> paymentService(int bookingId,String paytype) {
 
-	public ResponseEntity<ResponseStructure<upiPaymentDTO>> paymentService(int bookingid, String paytype) {
+	    Booking b = br.findById(bookingId).orElseThrow(()-> new BookingNotFoundException());
 
-	    Booking b = br.findById(bookingid).orElseThrow(() -> new BookingNotFoundException());
-	    String upiid = b.getDriver().getUpiid();
+	    String upiId = b.getDriver().getUpiid();
 	    double amount = b.getFare();
-	    String upiData = "upi://pay?pa=" + upiid +"&pn=FindRide" +"&am=" + amount +"&cu=INR";
 
-	    String encodedUpiData = URLEncoder.encode(upiData, StandardCharsets.UTF_8);
+	    String upiData = "upi://pay?pa=" + upiId +
+	            "&pn=FindRide&am=" + amount +
+	            "&cu=INR";
 
-	    String qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + encodedUpiData;
+	    String encoded = URLEncoder.encode(upiData, StandardCharsets.UTF_8);
+	    String qrUrl =
+	            "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + encoded;
 
 	    RestTemplate rt = new RestTemplate();
 	    byte[] qrBytes = rt.getForObject(qrUrl, byte[].class);
-	    upiPaymentDTO updto = new upiPaymentDTO();
-	    updto.setFare(amount);
-	    updto.setQr(qrBytes);
+
+	    upiPaymentDTO dto = new upiPaymentDTO();
+	    dto.setFare(amount);
+	    dto.setQr(qrBytes);
 
 	    ResponseStructure<upiPaymentDTO> rs = new ResponseStructure<>();
 	    rs.setStatuscode(HttpStatus.OK.value());
-	    rs.setMessage("UPI QR generated successfully");
-	    rs.setData(updto);
+	    rs.setMessage("UPI QR generated");
+	    rs.setData(dto);
 
-	    return new ResponseEntity<ResponseStructure<upiPaymentDTO>>(rs, HttpStatus.OK);
+	    return new ResponseEntity<ResponseStructure<upiPaymentDTO>>(rs,HttpStatus.OK);
 	}
 
-	public ResponseEntity<ResponseStructure<PaymentDTO>> confrimPaymentCollection(int bookingid, String paytype,int otp) {
-		
-		return completePayment(bookingid, paytype,otp);
+	public ResponseEntity<ResponseStructure<PaymentDTO>> confrimPaymentCollection (long driverMobile, int bookingId, String paytype,int otp) {
 
+	    return completePayment(driverMobile, bookingId, paytype, otp);
 	}
 
-	public ResponseEntity<ResponseStructure<Booking>> cancelbooking(int driverid, int bookingid) {
-		int cancelcount=0;
-		List<Booking> blist = br.findByDriverIdAndBookingDate(driverid,LocalDate.now());
-		Booking book = br.findById(bookingid).orElseThrow(()->new BookingNotFoundException());
-		for(Booking b:blist)
-		{
-			if(b.getBookingStatus()=="CANCELLED_BY_DRIVER")
-			{
-				cancelcount++;
-			}
-		}
-		Driver d = dr.findById(driverid).orElseThrow(()->new DriverNotFoundException());
-		if(cancelcount>=4)
-		{
-			d.setStatus("BLOCKED");
-			book.setBookingStatus("CANCELLED_BY_DRIVER");
-		}
-		else if(cancelcount<4)
-		{
-			book.setBookingStatus("CANCELLED_BY_DRIVER");
-		}
-		dr.save(d);
-		br.save(book);
-		ResponseStructure<Booking> rs = new ResponseStructure<Booking>();
-		rs.setStatuscode(HttpStatus.OK.value());
-		rs.setMessage("Booking cancelled successfully");
-		rs.setData(book);
-		return new ResponseEntity<ResponseStructure<Booking>>(rs,HttpStatus.OK);
-	}
 
-	public ResponseEntity<ResponseStructure<String>> startride(int otp,int bookingid) 
-	{	
-		Booking b = br.findById(bookingid).orElseThrow(()->new BookingNotFoundException());
-		if(otp!=b.getOtp()) throw new InvalidOtpException();
-		int otp1 = (int)(Math.random() * 9000) + 1000;
-		b.setOtp(otp1);
-		ResponseStructure<String> rs = new ResponseStructure<String>();
-		rs.setStatuscode(HttpStatus.OK.value());
-		rs.setMessage("OTP verified successfully");
-		rs.setData("OTP verified successfully");
-		return new ResponseEntity<ResponseStructure<String>>(rs,HttpStatus.OK);
-	}
+	public ResponseEntity<ResponseStructure<Booking>> cancelbooking(long mobile,int bookingId) {
 
-	public ResponseEntity<ResponseStructure<Driver>> updateDriverStatus(long mobileno, boolean active) 
-	{
-	    Driver d = dr.findByMobileno(mobileno).orElseThrow(() -> new DriverNotFoundException());
-	    Vehicle v = d.getVehicle();
-	    if (v == null) {
-	        throw new RuntimeException("Vehicle not assigned for this driver");
+	    Driver d = dr.findByMobileno(mobile).orElseThrow(()-> new DriverNotFoundException());
+
+	    Booking b = br.findById(bookingId).orElseThrow(()-> new BookingNotFoundException());
+
+	    int cancelCount = 0;
+
+	    List<Booking> todayBookings = br.findByDriverIdAndBookingDate(d.getId(), LocalDate.now());
+
+	    for (Booking bk : todayBookings) {
+	        if ("CANCELLED_BY_DRIVER".equals(bk.getBookingStatus())) {
+	            cancelCount++;
+	        }
 	    }
 
-	    if (active) 
-	    {
+	    b.setBookingStatus("CANCELLED_BY_DRIVER");
+
+	    if (cancelCount >= 4) {
+	        d.setStatus("BLOCKED");
+	        dr.save(d);
+	    }
+
+	    br.save(b);
+
+	    ResponseStructure<Booking> rs = new ResponseStructure<>();
+	    rs.setStatuscode(HttpStatus.OK.value());
+	    rs.setMessage("Booking cancelled");
+	    rs.setData(b);
+
+	    return new ResponseEntity<ResponseStructure<Booking>>(rs,HttpStatus.OK);
+	}
+
+	public ResponseEntity<ResponseStructure<String>> startride(long mobile, int otp, int bookingId) {
+
+	    Booking b = br.findById(bookingId).orElseThrow(()-> new BookingNotFoundException());
+
+	    if (otp != b.getOtp()) throw new InvalidOtpException();
+
+	    int newOtp = (int) (Math.random() * 9000) + 1000;
+	    b.setOtp(newOtp);
+	    br.save(b);
+
+	    ResponseStructure<String> rs = new ResponseStructure<>();
+	    rs.setStatuscode(HttpStatus.OK.value());
+	    rs.setMessage("Ride started");
+	    rs.setData("OTP verified");
+
+	    return new ResponseEntity<ResponseStructure<String>>(rs,HttpStatus.OK);
+	}
+
+
+	public ResponseEntity<ResponseStructure<Driver>> updateDriverStatus(long mobile,boolean active) {
+
+	    Driver d = dr.findByMobileno(mobile).orElseThrow(()-> new DriverNotFoundException());
+
+	    Vehicle v = d.getVehicle();
+	    if (v == null) throw new VehicleNotFoundException();
+
+	    if (active) {
 	        d.setStatus("AVAILABLE");
 	        v.setAvailableStatus("AVAILABLE");
 	    } 
-	    else 
-	    {
+	    else {
 	        d.setStatus("NOT_AVAILABLE");
 	        v.setAvailableStatus("NOT_AVAILABLE");
 	    }
@@ -372,9 +397,10 @@ public class DriverService {
 
 	    ResponseStructure<Driver> rs = new ResponseStructure<>();
 	    rs.setStatuscode(HttpStatus.OK.value());
-	    rs.setMessage("Driver status updated to " + d.getStatus());
+	    rs.setMessage("Status updated");
 	    rs.setData(d);
-	    return new ResponseEntity<ResponseStructure<Driver>>(rs, HttpStatus.OK);
+
+	    return new ResponseEntity<ResponseStructure<Driver>>(rs,HttpStatus.OK);
 	}
 
 }

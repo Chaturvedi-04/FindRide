@@ -3,6 +3,7 @@ package com.alpha.FindRide.Entity;
 import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,12 +20,13 @@ public class Booking {
 	private int id;
 	
 	@ManyToOne
-	@JoinColumn(name = "cust_id")
-	@JsonIgnore
+	@JsonIgnoreProperties({"bookingList", "user"})
+	@JoinColumn(name = "customer_id")
 	private Customer cust;
-	
-	@OneToOne
-	@JsonIgnore
+
+	@ManyToOne
+	@JsonIgnoreProperties({"bookingList"})
+	@JoinColumn(name = "driver_id")
 	private Driver driver;
 	
 	@OneToOne
@@ -151,8 +153,7 @@ public class Booking {
 	}
 	@Override
 	public String toString() {
-		return "Booking [id=" + id + ", cust=" + cust + ", driver=" + driver + ", vehicle=" + vehicle + ", sourceLoc="
-				+ sourceLoc + ", destinationLoc=" + destinationLoc + ", distanceTravelled=" + distanceTravelled
+		return "Booking [id=" + id + ", sourceLoc=" + sourceLoc + ", destinationLoc=" + destinationLoc + ", distanceTravelled=" + distanceTravelled
 				+ ", fare=" + fare + ", estimatedTime=" + estimatedTime + ", bookingDate=" + bookingDate
 				+ ", paymentStatus=" + paymentStatus + ", payment=" + payment + ", bookingStatus=" + bookingStatus
 				+ ", otp=" + otp + "]";

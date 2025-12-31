@@ -2,15 +2,9 @@ package com.alpha.FindRide.DTO;
 
 public class UpdateLocationDTO {
 	
-	private long mobileno;
 	private String latitude;
 	private String longitude;
-	public long getMobileno() {
-		return mobileno;
-	}
-	public void setMobileno(long mobileno) {
-		this.mobileno = mobileno;
-	}
+	
 	public String getLatitude() {
 		return latitude;
 	}
@@ -23,9 +17,8 @@ public class UpdateLocationDTO {
 	public void setLongitude(String longitude) {
 		this.longitude = longitude;
 	}
-	public UpdateLocationDTO(long mobileno, String latitude, String longitude) {
+	public UpdateLocationDTO( String latitude, String longitude) {
 		super();
-		this.mobileno = mobileno;
 		this.latitude = latitude;
 		this.longitude = longitude;
 	}
@@ -34,6 +27,6 @@ public class UpdateLocationDTO {
 	}
 	@Override
 	public String toString() {
-		return "UpdateLocationDTO [mobileno=" + mobileno + ", latitude=" + latitude + ", longitude=" + longitude + "]";
+		return "UpdateLocationDTO [ latitude=" + latitude + ", longitude=" + longitude + "]";
 	}
 }

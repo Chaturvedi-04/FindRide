@@ -2,6 +2,8 @@ package com.alpha.FindRide.Entity;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -27,17 +29,15 @@ public class Driver {
 	private String mailid;
 	
 	@OneToOne(optional = false)
-    @JoinColumn(
-        name = "user_id",
-        nullable = false,
-        unique = true
-    )
-    private AppUser user;
+	@JsonIgnore 
+	@JoinColumn(name = "user_id", nullable = false, unique = true)
+	private AppUser user;
 	
 	@OneToOne(mappedBy = "driver", cascade = CascadeType.ALL)
 	private Vehicle vehicle;
 
-	@OneToMany
+	@OneToMany(mappedBy = "driver", cascade = CascadeType.ALL)
+	@JsonIgnore
 	private List<Booking> bookingList;
 
 	public int getId() {
@@ -158,9 +158,16 @@ public class Driver {
 
 	@Override
 	public String toString() {
-		return "Driver [id=" + id + ", licenseNo=" + licenseNo + ", upiid=" + upiid + ", name=" + name + ", status="
-				+ status + ", age=" + age + ", mobileno=" + mobileno + ", gender=" + gender + ", mailid=" + mailid
-				+ ", user=" + user + ", vehicle=" + vehicle + ", bookingList=" + bookingList + "]";
+	    return "Driver [id=" + id +
+	            ", licenseNo=" + licenseNo +
+	            ", upiid=" + upiid +
+	            ", name=" + name +
+	            ", status=" + status +
+	            ", age=" + age +
+	            ", mobileno=" + mobileno +
+	            ", gender=" + gender +
+	            ", mailid=" + mailid +
+	            "]";
 	}
 
 }

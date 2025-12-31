@@ -29,16 +29,14 @@ public class Customer {
 	private int penaltyCount = 0;
 	
 	@OneToOne(optional = false)
-    @JoinColumn(
-        name = "user_id",
-        nullable = false,
-        unique = true
-    )
-    private AppUser user;
+	@JsonIgnore 
+	@JoinColumn(name = "user_id", nullable = false, unique = true)
+	private AppUser user;
 	
 	@OneToMany(mappedBy = "cust", cascade = CascadeType.ALL)
 	@JsonIgnore
 	private List<Booking> bookingList;
+	
 	public Customer(String name, int age, String gender, long mobileno, String emailid, String currentloc,
 			boolean bookingStatus, int penaltyCount, AppUser user, List<Booking> bookingList) {
 		super();
@@ -124,9 +122,16 @@ public class Customer {
 	}
 	@Override
 	public String toString() {
-		return "Customer [id=" + id + ", name=" + name + ", age=" + age + ", gender=" + gender + ", mobileno="
-				+ mobileno + ", emailid=" + emailid + ", currentloc=" + currentloc + ", bookingStatus=" + bookingStatus
-				+ ", penaltyCount=" + penaltyCount + ", Appuser=" + user + ", bookingList=" + bookingList + "]";
+	    return "Customer [id=" + id +
+	            ", name=" + name +
+	            ", age=" + age +
+	            ", gender=" + gender +
+	            ", mobileno=" + mobileno +
+	            ", emailid=" + emailid +
+	            ", currentloc=" + currentloc +
+	            ", bookingStatus=" + bookingStatus +
+	            ", penaltyCount=" + penaltyCount +
+	            "]";
 	}
 	
 	

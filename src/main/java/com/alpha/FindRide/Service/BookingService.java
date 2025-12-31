@@ -1,7 +1,6 @@
 package com.alpha.FindRide.Service;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,94 +22,98 @@ import com.alpha.FindRide.Repository.CustomerRepo;
 import com.alpha.FindRide.Repository.DriverRepo;
 import com.alpha.FindRide.Repository.VehicleRepo;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class BookingService {
-	
-	@Autowired
-	private BookingRepo br;
-	
-	@Autowired
-	private CustomerRepo cr;
-	
-	@Autowired
-	private VehicleRepo vr;
-	
-	@Autowired
-	private DriverRepo dr;
-	
-	@Autowired
-	private MailService ms;
-	
-	public ResponseEntity<ResponseStructure<ActiveBookingDTO>> bookVehicle(long mobileno,BookingDTO bookingdto)
-	{
-		Customer c = cr.findByMobileno(mobileno).orElseThrow(()->new CustomerNotFoundException());
-		Booking b1 = new Booking();
-		if(c.isBookingStatus()==true)
-		{
-			List<Booking> blist = c.getBookingList();
-			for(Booking b: blist)
-			{
-				if ("BOOKED".equals(b.getBookingStatus()))
-				{
-					b1=b;
-					break;
-				}
-			}
-			ActiveBookingDTO abdto = new ActiveBookingDTO();
-			abdto.setBooking(b1);
-			abdto.setCustname(c.getName());
-			abdto.setCustmobno(mobileno);
-			abdto.setCurrentlocation(c.getCurrentloc());
-			ResponseStructure<ActiveBookingDTO> rs = new ResponseStructure<ActiveBookingDTO>();
-			rs.setStatuscode(HttpStatus.OK.value());
-			rs.setMessage("You have alredy booked one vehicle cant book one more vehicle");
-			rs.setData(abdto);
-			return new ResponseEntity<ResponseStructure<ActiveBookingDTO>>(rs,HttpStatus.OK);
-		}
-		else
-		{
-			Vehicle v = vr.findById(bookingdto.getVehicleid()).orElseThrow(()->new VehicleNotFoundException());
-			Driver d = dr.findById(v.getId()).orElseThrow(()->new DriverNotFoundException());
-			Booking b = new Booking();
-			b.setCust(c);
-			b.setVehicle(v);
-			b.setDriver(d);
-			b.setPaymentStatus("NOT_PAID");
-			b.setSourceLoc(bookingdto.getSourceLoc());
-			b.setDestinationLoc(bookingdto.getDestinationLoc());
-			b.setFare(bookingdto.getFare());
-			b.setEstimatedTime(bookingdto.getEstimatedTime());
-			b.setDistanceTravelled(bookingdto.getDistanceTravelled());
-			b.setBookingDate(LocalDate.now());
-			b.setBookingStatus("BOOKED");
-			int otp = (int)(Math.random() * 9000) + 1000;
-			b.setOtp(otp);
-		    double baseFare = v.getPricePerKM() * bookingdto.getDistanceTravelled();
-		    double totalFare = baseFare;
-		    int penaltyCount = c.getPenaltyCount();
-		    if (penaltyCount > 1) {
-		        totalFare = baseFare + (baseFare / 100) * penaltyCount * 10;
-		    }
-		    b.setFare(totalFare);
-			br.save(b);
-			
-			c.getBookingList().add(b);
-			c.setBookingStatus(true);
-			v.getDriver().getBookingList().add(b);
-			v.setAvailableStatus("BOOKED");
-			cr.save(c);
-			vr.save(v);
-			
-			ActiveBookingDTO abdto = new ActiveBookingDTO();
-			abdto.setBooking(b);
-			abdto.setCustname(c.getName());
-			abdto.setCustmobno(mobileno);
-			abdto.setCurrentlocation(c.getCurrentloc());
-			ResponseStructure<ActiveBookingDTO> rs = new ResponseStructure<ActiveBookingDTO>();
-			rs.setStatuscode(HttpStatus.OK.value());
-			rs.setMessage("You have successfully booked the vehicle");
-			rs.setData(abdto);
-			ms.sendMail(c.getEmailid(),"Booking Confirmation","Dear" +c.getName()+"\r\n"
+
+    @Autowired
+    private BookingRepo br;
+    @Autowired
+    private CustomerRepo cr;
+    @Autowired
+    private VehicleRepo vr;
+    @Autowired
+    private DriverRepo dr;
+    @Autowired
+    private MailService ms;
+
+    @Transactional
+    public ResponseEntity<ResponseStructure<ActiveBookingDTO>> bookVehicle(long mobileno, BookingDTO bookingdto) {
+
+        Customer c = cr.findByMobileno(mobileno).orElseThrow(()-> new CustomerNotFoundException());
+
+        if (c.isBookingStatus()) {
+
+            Booking activeBooking = null;
+            for (Booking b : c.getBookingList()) {
+                if ("BOOKED".equals(b.getBookingStatus())) {
+                    activeBooking = b;
+                    break;
+                }
+            }
+
+            ActiveBookingDTO abdto = new ActiveBookingDTO();
+            abdto.setBooking(activeBooking);
+            abdto.setCustname(c.getName());
+            abdto.setCustmobno(mobileno);
+            abdto.setCurrentlocation(c.getCurrentloc());
+
+            ResponseStructure<ActiveBookingDTO> rs = new ResponseStructure<>();
+            rs.setStatuscode(HttpStatus.OK.value());
+            rs.setMessage("You have already booked one vehicle");
+            rs.setData(abdto);
+
+            return new ResponseEntity<ResponseStructure<ActiveBookingDTO>>(rs, HttpStatus.OK);
+        }
+
+        Vehicle v = vr.findById(bookingdto.getVehicleid())
+                .orElseThrow(VehicleNotFoundException::new);
+
+        Driver d = v.getDriver();
+        if (d == null) throw new DriverNotFoundException();
+
+        Booking b = new Booking();
+        b.setCust(c);
+        b.setDriver(d);
+        b.setVehicle(v);
+        b.setPaymentStatus("NOT_PAID");
+        b.setSourceLoc(bookingdto.getSourceLoc());
+        b.setDestinationLoc(bookingdto.getDestinationLoc());
+        b.setEstimatedTime(bookingdto.getEstimatedTime());
+        b.setDistanceTravelled(bookingdto.getDistanceTravelled());
+        b.setBookingDate(LocalDate.now());
+        b.setBookingStatus("BOOKED");
+        b.setOtp((int) (Math.random() * 9000) + 1000);
+
+        double baseFare = v.getPricePerKM() * bookingdto.getDistanceTravelled();
+        if (c.getPenaltyCount() > 1) {
+            baseFare += (baseFare / 100) * c.getPenaltyCount() * 10;
+        }
+        b.setFare(baseFare);
+
+        c.getBookingList().add(b);
+        d.getBookingList().add(b);
+        c.setBookingStatus(true);
+        v.setAvailableStatus("BOOKED");
+
+        br.save(b);
+        cr.save(c);
+        dr.save(d);
+        vr.save(v);
+
+        ActiveBookingDTO abdto = new ActiveBookingDTO();
+        abdto.setBooking(b);
+        abdto.setCustname(c.getName());
+        abdto.setCustmobno(mobileno);
+        abdto.setCurrentlocation(c.getCurrentloc());
+
+        ResponseStructure<ActiveBookingDTO> rs = new ResponseStructure<>();
+        rs.setStatuscode(HttpStatus.OK.value());
+        rs.setMessage("You have successfully booked the vehicle");
+        rs.setData(abdto);        
+		ms.sendMail(c.getEmailid(),"Booking Confirmation",
+					"Dear" +c.getName()+"\r\n"
 					+ "\r\n"
 					+ "Your booking has been successfully confirmed! 🎉\r\n"
 					+ "\r\n"
@@ -135,7 +138,7 @@ public class BookingService {
 					+ "📞 9908223304  \r\n"
 					+ "📧 support@gmail.com\r\n"
 					+ "");
-			ms.sendMail(d.getMailid(),"Booking Confirmation","\"Booking Assigned\",\"Dear" + d.getName() + "\r\n"
+		ms.sendMail(d.getMailid(),"Booking Confirmation","\"Booking Assigned\",\"Dear" + d.getName() + "\r\n"
 					+ "        + \"You have been assigned a new booking! 🚗\\r\\n\"\r\n"
 					+ "        + \"\\r\\n\"\r\n"
 					+ "        + \"📌 Booking Details:\\r\\n\"\r\n"
@@ -161,5 +164,4 @@ public class BookingService {
 					+ "");
 			return new ResponseEntity<ResponseStructure<ActiveBookingDTO>>(rs,HttpStatus.OK);
 		}
-	}
 }

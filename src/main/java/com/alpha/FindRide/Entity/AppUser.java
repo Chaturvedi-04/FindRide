@@ -26,7 +26,7 @@ public class AppUser {
 		return mobileno;
 	}
 	public void setMobileno(long mobileno) {
-		this.mobileno = mobileno;
+	    this.mobileno = mobileno;
 	}
 	public String getPassword() {
 		return password;
@@ -52,6 +52,10 @@ public class AppUser {
 	}
 	@Override
 	public String toString() {
-		return "AppUser [id=" + id + ", mobileno=" + mobileno + ", password=" + password + ", role=" + role + "]";
+	    return "AppUser [id=" + id +
+	            ", mobileno=" + mobileno +
+	            ", role=" + role +
+	            "]";
 	}
+
 }

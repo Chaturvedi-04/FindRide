@@ -55,7 +55,7 @@ public class CustomerService {
 	private BookingRepo br;
 	
 	@Autowired
-	private AppUserRepo ar;
+	private AppUserRepo appuserrep;
 	
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -71,7 +71,7 @@ public class CustomerService {
 		a.setMobileno(rdto.getMobileno());
 		a.setPassword(passwordEncoder.encode(rdto.getPassword()));
 		a.setRole("CUSTOMER");
-		ar.save(a);
+		appuserrep.save(a);
 		
 		Customer c = new Customer();
 		c.setName(rdto.getName());
@@ -220,30 +220,36 @@ public class CustomerService {
 	}
 	
 	public ResponseEntity<ResponseStructure<BookingHistoryDTO>> seeBookingHistory(long mobileno) {
-		Customer c = cr.findByMobileno(mobileno).orElseThrow(()->new CustomerNotFoundException());
-		List<Booking> blist = c.getBookingList();
-		List<RidedetailDTO> ridedetaildto = new ArrayList<RidedetailDTO>();
-		double totalamount=0;
-		
-		for(Booking b : blist)
-		{
-			RidedetailDTO rdto = new RidedetailDTO();
-			rdto.setFromloc(b.getSourceLoc());
-			rdto.setToloc(b.getDestinationLoc());
-			rdto.setDistance(b.getDistanceTravelled());
-			rdto.setFare(b.getFare());
-			ridedetaildto.add(rdto);
-			totalamount+=b.getFare();
-		}
-		BookingHistoryDTO bhdto = new BookingHistoryDTO();
-		bhdto.setHistory(ridedetaildto);
-		bhdto.setTotalamount(totalamount);
-		ResponseStructure<BookingHistoryDTO> rs = new ResponseStructure<BookingHistoryDTO>();
-		rs.setStatuscode(HttpStatus.OK.value());
-		rs.setMessage("Booking History is Fetched");
-		rs.setData(bhdto);
-		return new ResponseEntity<ResponseStructure<BookingHistoryDTO>>(rs,HttpStatus.OK);
+
+	    Customer c = cr.findByMobileno(mobileno).orElseThrow(()-> new CustomerNotFoundException());
+
+	    List<Booking> blist = c.getBookingList();
+	    List<RidedetailDTO> history = new ArrayList<>();
+
+	    double total = 0;
+
+	    for (Booking b : blist) {
+	        RidedetailDTO rd = new RidedetailDTO();
+	        rd.setFromloc(b.getSourceLoc());
+	        rd.setToloc(b.getDestinationLoc());
+	        rd.setDistance(b.getDistanceTravelled());
+	        rd.setFare(b.getFare());
+	        history.add(rd);
+	        total += b.getFare();
+	    }
+
+	    BookingHistoryDTO bh = new BookingHistoryDTO();
+	    bh.setHistory(history);
+	    bh.setTotalamount(total);
+
+	    ResponseStructure<BookingHistoryDTO> rs = new ResponseStructure<>();
+	    rs.setStatuscode(HttpStatus.OK.value());
+	    rs.setMessage("Booking history fetched");
+	    rs.setData(bh);
+
+	    return new ResponseEntity<ResponseStructure<BookingHistoryDTO>>(rs,HttpStatus.OK);
 	}
+
 
 
 	public ResponseEntity<ResponseStructure<ActiveBookingDTO>> seeActiveBooking(long mobileno) {
@@ -262,9 +268,10 @@ public class CustomerService {
 		return new ResponseEntity<ResponseStructure<ActiveBookingDTO>>(rs,HttpStatus.OK);
 	}
 	
-	public ResponseEntity<ResponseStructure<Customer>> updateLocationDriver(UpdateLocationDTO udto) {
+	public ResponseEntity<ResponseStructure<Customer>> updateCustomerLocation(long mobileno, UpdateLocationDTO udto) {
 
-	    Customer c = cr.findByMobileno(udto.getMobileno()).orElseThrow(()->new CustomerNotFoundException());
+	    Customer c = cr.findByMobileno(mobileno).orElseThrow(()-> new CustomerNotFoundException());
+
 	    try {
 	        String url = "https://us1.locationiq.com/v1/reverse?key=" + apiKey +
 	                "&lat=" + udto.getLatitude() +
@@ -273,18 +280,21 @@ public class CustomerService {
 
 	        RestTemplate restTemplate = new RestTemplate();
 	        ObjectMapper mapper = new ObjectMapper();
-	        
-	        JsonNode json = mapper.readTree(restTemplate.getForObject(url, String.class));
 
-	        String city = json.get("address").get("city").asString();
+	        JsonNode json = mapper.readTree(
+	                restTemplate.getForObject(url, String.class)
+	        );
+
+	        String city = json.get("address").get("city").asText();
 	        c.setCurrentloc(city);
 
 	    } catch (Exception e) {
-	        throw new LocationFetchException("Failed to fetch location from LocationIQ: " + e.getMessage());
+	        throw new LocationFetchException(
+	                "Failed to fetch location from LocationIQ: " + e.getMessage()
+	        );
 	    }
 
 	    cr.save(c);
-
 	    ResponseStructure<Customer> rs = new ResponseStructure<>();
 	    rs.setStatuscode(HttpStatus.OK.value());
 	    rs.setMessage("Customer location updated successfully");
@@ -292,41 +302,36 @@ public class CustomerService {
 	    return new ResponseEntity<ResponseStructure<Customer>>(rs,HttpStatus.OK);
 	}
 	
-	public ResponseEntity<ResponseStructure<Booking>> cancelbooking(int customerid, int bookingid) {
-		
-		Customer c = cr.findById(customerid).orElseThrow(()->new CustomerNotFoundException());
-		Booking book = br.findById(bookingid).orElseThrow(()->new BookingNotFoundException());
+	public ResponseEntity<ResponseStructure<Booking>> cancelbooking(long mobileno, int bookingid) {
 
-//		Vehicle v= vr.findById(v.getId()).orElseThrow(()->new VehicleNotFoundException());
-				
-		if (book.getCust().getId() != customerid) {
-			throw new BookingNotFoundException(); 
-		}
-		if (book.getBookingStatus().equalsIgnoreCase("CANCELLED_BY_CUSTOMER")) {
-		        throw new IllegalStateException("Booking already cancelled");
-		}
+	    Customer c = cr.findByMobileno(mobileno).orElseThrow(()-> new CustomerNotFoundException());
 
-		book.setBookingStatus("CANCELLED_BY_CUSTOMER");
-		book.setPaymentStatus("NOT_PAID");
-		
-		if (c.getPenaltyCount() >= 1) {      
-		        c.setPenaltyCount(c.getPenaltyCount() + 1);
-		 } else {       
-		        c.setPenaltyCount(1);
-		 }
+	    Booking book = br.findById(bookingid).orElseThrow(()-> new BookingNotFoundException());
+
+	    if (book.getCust().getMobileno() != mobileno) {
+	        throw new BookingNotFoundException();
+	    }
+
+	    if ("CANCELLED_BY_CUSTOMER".equals(book.getBookingStatus())) {
+	        throw new IllegalStateException("Booking already cancelled");
+	    }
+
+	    book.setBookingStatus("CANCELLED_BY_CUSTOMER");
+	    book.setPaymentStatus("NOT_PAID");
+
+	    c.setPenaltyCount(c.getPenaltyCount() + 1);
 	    c.setBookingStatus(false);
-	    
-		br.save(book);
-		cr.save(c);
 
-		Vehicle v = book.getVehicle();
-		Driver d = book.getDriver();
+	    Vehicle v = book.getVehicle();
+	    Driver d = book.getDriver();
 
-		v.setAvailableStatus("AVAILABLE");
-		d.setStatus("AVAILABLE");
+	    v.setAvailableStatus("AVAILABLE");
+	    d.setStatus("AVAILABLE");
 
-		vr.save(v);
-		dr.save(d);
+	    br.save(book);
+	    cr.save(c);
+	    vr.save(v);
+	    dr.save(d);
 		
 		ResponseStructure<Booking> rs = new ResponseStructure<Booking>();
 		rs.setStatuscode(HttpStatus.OK.value());
